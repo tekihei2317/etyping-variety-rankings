@@ -1,0 +1,29 @@
+{
+  "name": "etyping-variety-rankings",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "scrape": "tsx src/scraper.ts",
+    "dev": "tsx src/scraper.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tekihei2317/etyping-variety-rankings.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tekihei2317/etyping-variety-rankings/issues"
+  },
+  "homepage": "https://github.com/tekihei2317/etyping-variety-rankings#readme",
+  "dependencies": {
+    "@types/node": "^24.0.3",
+    "cheerio": "^1.1.0",
+    "puppeteer": "^24.10.2",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}
