@@ -15,24 +15,40 @@ interface TotalRankingEntry {
 
 interface RankingResponse {
   totalRanking: TotalRankingEntry[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    pageSize: number;
+  };
 }
 
 function App() {
   const [ranking, setRanking] = useState<TotalRankingEntry[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // ランキングデータを取得
-  const fetchRanking = async () => {
+  const fetchRanking = async (page: number) => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await client.api.ranking.$get();
+      const response = await client.api.ranking.$get({
+        query: {
+          page: page.toString(),
+        },
+      });
 
       if (response.ok) {
         const data: RankingResponse = await response.json();
         setRanking(data.totalRanking);
+        setCurrentPage(data.pagination.currentPage);
+        setTotalPages(data.pagination.totalPages);
+        setTotalCount(data.pagination.totalCount);
       } else {
         setError("ランキングデータの取得に失敗しました");
       }
@@ -46,8 +62,15 @@ function App() {
 
   // 初回読み込み
   useEffect(() => {
-    fetchRanking();
+    fetchRanking(1);
   }, []);
+
+  // ページ変更
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      fetchRanking(page);
+    }
+  };
 
   if (loading) {
     return (
@@ -63,7 +86,7 @@ function App() {
       <div className="container">
         <h1>e-typing バラエティ 総合ランキング</h1>
         <p className="error">エラー: {error}</p>
-        <button onClick={() => fetchRanking()}>再読み込み</button>
+        <button onClick={() => fetchRanking(currentPage)}>再読み込み</button>
       </div>
     );
   }
@@ -74,7 +97,7 @@ function App() {
       <p>バラエティ全13種目の合計スコアランキング</p>
 
       <div className="ranking-info">
-        <p>全 {ranking.length} 名のユーザー（上位200名まで表示）</p>
+        <p>全 {totalCount} 名のユーザー | ページ {currentPage} / {totalPages}</p>
       </div>
 
       <table className="ranking-table">
@@ -99,6 +122,27 @@ function App() {
           })}
         </tbody>
       </table>
+
+      {/* ページネーション */}
+      <div className="pagination">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage <= 1}
+        >
+          前のページ
+        </button>
+
+        <span className="page-info">
+          {currentPage} / {totalPages}
+        </span>
+
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage >= totalPages}
+        >
+          次のページ
+        </button>
+      </div>
 
       <div className="footer">
         <p>

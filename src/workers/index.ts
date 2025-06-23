@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import { rankings } from "../data/ranking";
 import { calculateTotalScoreRanking } from "./ranking";
+import { z } from "zod";
+import { zValidator } from "@hono/zod-validator";
 
 const categories = [
   { id: "business", name: "ビジネス" },
@@ -18,10 +20,37 @@ const categories = [
   { id: "medical", name: "医療介護" },
 ];
 
+const rankingQuery = z.object({
+  page: z
+    .string()
+    .transform((val) => parseInt(val))
+    .pipe(z.number().min(1))
+    .optional()
+    .default("1"),
+});
+
 const apiApp = new Hono<{ Bindings: Env }>()
-  .get("/ranking", (c) => {
+  .get("/ranking", zValidator("query", rankingQuery), (c) => {
+    const { page } = c.req.valid("query");
+    const pageSize = 50;
+
     const totalRanking = calculateTotalScoreRanking(rankings);
-    return c.json({ totalRanking: totalRanking.slice(0, 200) });
+    const totalCount = totalRanking.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const pageData = totalRanking.slice(startIndex, endIndex);
+
+    return c.json({
+      totalRanking: pageData,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        pageSize,
+      },
+    });
   })
   .get("/categories", (c) => {
     return c.json({ categories });
