@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "scrape": "tsx src/scraper.ts",
-    "dev": "tsx src/scraper.ts"
+    "dev": "tsx src/scraper.ts",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "workers:dev": "wrangler dev"
   },
   "repository": {
     "type": "git",
@@ -25,5 +28,10 @@
     "puppeteer": "^24.10.2",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0",
+    "@cloudflare/puppeteer": "^1.0.2",
+    "@cloudflare/workers-types": "^4.20241127.0"
   }
 }

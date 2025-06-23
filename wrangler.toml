@@ -1,0 +1,12 @@
+name = "etyping-ranking-api"
+main = "workers/index.ts"
+compatibility_flags = [ "nodejs_compat_v2" ]
+compatibility_date = "2024-09-23"
+
+browser = { binding = "MYBROWSER" }
+
+[env.production]
+name = "etyping-ranking-api"
+
+[env.staging]
+name = "etyping-ranking-api-staging"

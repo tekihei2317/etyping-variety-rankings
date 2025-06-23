@@ -10,8 +10,9 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "types": ["@cloudflare/workers-types"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "workers/**/*"],
   "exclude": ["node_modules", "dist"]
 }
