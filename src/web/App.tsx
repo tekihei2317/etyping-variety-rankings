@@ -3,7 +3,7 @@ import { hc } from "hono/client";
 import type { AppType } from "../workers/index";
 import "./App.css";
 
-const client = hc<AppType>("http://localhost:5174");
+const client = hc<AppType>("/");
 
 interface TotalRankingEntry {
   rank: number;
@@ -97,7 +97,9 @@ function App() {
       <p>バラエティ全13種目の合計スコアランキング</p>
 
       <div className="ranking-info">
-        <p>全 {totalCount} 名のユーザー | ページ {currentPage} / {totalPages}</p>
+        <p>
+          全 {totalCount} 名のユーザー | ページ {currentPage} / {totalPages}
+        </p>
       </div>
 
       <table className="ranking-table">
