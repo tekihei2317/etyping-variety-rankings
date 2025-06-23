@@ -6,6 +6,7 @@
 - Cloudflare Workersのnodejs_compatって何
 - HonoでAPIを作るにはどうすればいいか
 - Honoで作成したAPIを、クライアント（React）からアクセスするにはどうすればいいか
+- HonoのRPCのドキュメント見てるけど、複数のエンドポイントある場合の書き方が分からない
 
 ### Cloudflareのpuppeteerのドキュメントがあったので読もう
 
@@ -21,6 +22,13 @@ DevTools Portってなんだろう。
 
 [Node.js compatibility · Cloudflare Workers docs](https://developers.cloudflare.com/workers/runtime-apis/nodejs/)
 
+### HonoのRPCのドキュメント見てるけど、複数のエンドポイントある場合の書き方が分からない
+
+[Hono Stacks - Hono](https://hono.dev/docs/concepts/stacks)
+
+[Grouping routes for RPC - Hono](https://hono.dev/examples/grouping-routes-rpc)
+
+examplesのところに例がいろいろ載っていて、それがドキュメントの代わりになっている感じっぽい。もっとドキュメント欲しいな...。
 
 ### その他
 
