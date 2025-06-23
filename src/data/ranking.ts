@@ -27,3 +27,5 @@ export const rankings = {
   travel: travelRanking,
   what: whatRanking,
 };
+
+export type Rankings = typeof rankings;

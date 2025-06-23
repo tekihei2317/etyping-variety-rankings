@@ -6,6 +6,7 @@ import "./App.css";
 const client = hc<AppType>("http://localhost:5174");
 
 interface TotalRankingEntry {
+  rank: number;
   username: string;
   totalScore: number;
   categoryScores: Record<string, number>;
@@ -13,46 +14,28 @@ interface TotalRankingEntry {
 }
 
 interface RankingResponse {
-  success: boolean;
-  data: TotalRankingEntry[];
-  totalPages: number;
-  currentPage: number;
-  totalCount: number;
-  message: string;
+  totalRanking: TotalRankingEntry[];
 }
 
 function App() {
   const [ranking, setRanking] = useState<TotalRankingEntry[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // ランキングデータを取得
-  const fetchRanking = async (page: number) => {
+  const fetchRanking = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await client.api.ranking.$get({
-        query: {
-          page: page.toString(),
-          pageSize: "50",
-        },
-      });
+      const response = await client.api.ranking.$get();
 
-      console.log(await response.json());
-
-      // if (response.ok) {
-      //   const data: RankingResponse = await response.json();
-      //   setRanking(data.data);
-      //   setCurrentPage(data.currentPage);
-      //   setTotalPages(data.totalPages);
-      //   setTotalCount(data.totalCount);
-      // } else {
-      //   setError("ランキングデータの取得に失敗しました");
-      // }
+      if (response.ok) {
+        const data: RankingResponse = await response.json();
+        setRanking(data.totalRanking);
+      } else {
+        setError("ランキングデータの取得に失敗しました");
+      }
     } catch (err) {
       setError("ネットワークエラーが発生しました");
       console.error("Error fetching ranking:", err);
@@ -63,15 +46,8 @@ function App() {
 
   // 初回読み込み
   useEffect(() => {
-    fetchRanking(1);
+    fetchRanking();
   }, []);
-
-  // ページ変更
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      fetchRanking(page);
-    }
-  };
 
   if (loading) {
     return (
@@ -85,22 +61,20 @@ function App() {
   if (error) {
     return (
       <div className="container">
-        <h1>e-typing バラエティ ランキング</h1>
+        <h1>e-typing バラエティ 総合ランキング</h1>
         <p className="error">エラー: {error}</p>
-        <button onClick={() => fetchRanking(currentPage)}>再読み込み</button>
+        <button onClick={() => fetchRanking()}>再読み込み</button>
       </div>
     );
   }
 
   return (
     <div className="container">
-      <h1>e-typing バラエティ ランキング</h1>
+      <h1>e-typing バラエティ 総合ランキング</h1>
       <p>バラエティ全13種目の合計スコアランキング</p>
 
       <div className="ranking-info">
-        <p>
-          全 {totalCount} 名のユーザー | ページ {currentPage} / {totalPages}
-        </p>
+        <p>全 {ranking.length} 名のユーザー（上位200名まで表示）</p>
       </div>
 
       <table className="ranking-table">
@@ -110,49 +84,21 @@ function App() {
             <th>ユーザー名</th>
             <th>合計スコア</th>
             <th>参加種目数</th>
-            <th>平均スコア</th>
           </tr>
         </thead>
         <tbody>
-          {ranking.map((entry, index) => {
-            const rank = (currentPage - 1) * 50 + index + 1;
-            const averageScore = Math.round(
-              entry.totalScore / entry.categoriesPlayed
-            );
-
+          {ranking.map((entry) => {
             return (
               <tr key={entry.username}>
-                <td>{rank}</td>
+                <td>{entry.rank}</td>
                 <td>{entry.username}</td>
                 <td>{entry.totalScore.toLocaleString()}</td>
                 <td>{entry.categoriesPlayed}</td>
-                <td>{averageScore.toLocaleString()}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
-
-      {/* ページネーション */}
-      <div className="pagination">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage <= 1}
-        >
-          前のページ
-        </button>
-
-        <span className="page-info">
-          {currentPage} / {totalPages}
-        </span>
-
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage >= totalPages}
-        >
-          次のページ
-        </button>
-      </div>
 
       <div className="footer">
         <p>
