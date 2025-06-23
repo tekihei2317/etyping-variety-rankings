@@ -1,5 +1,5 @@
 name = "etyping-ranking-api"
-main = "workers/index.ts"
+main = "src/workers/index.ts"
 compatibility_flags = [ "nodejs_compat_v2" ]
 compatibility_date = "2024-09-23"
 

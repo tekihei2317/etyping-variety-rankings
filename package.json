@@ -6,10 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "scrape": "tsx src/scraper.ts",
-    "dev": "tsx src/scraper.ts",
+    "build": "tsc -b && vite build",
+    "dev": "vite",
+    "preview": "npm run build && vite preview",
     "deploy": "wrangler deploy",
-    "deploy:staging": "wrangler deploy --env staging",
-    "workers:dev": "wrangler dev"
+    "deploy:staging": "wrangler deploy --env staging"
   },
   "repository": {
     "type": "git",
@@ -23,15 +24,26 @@
   },
   "homepage": "https://github.com/tekihei2317/etyping-variety-rankings#readme",
   "dependencies": {
+    "@hono/zod-validator": "^0.7.0",
     "@types/node": "^24.0.3",
     "cheerio": "^1.1.0",
+    "hono": "^4.7.7",
     "puppeteer": "^24.10.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
-    "wrangler": "^3.0.0",
     "@cloudflare/puppeteer": "^1.0.2",
-    "@cloudflare/workers-types": "^4.20241127.0"
-  }
+    "@cloudflare/vite-plugin": "^1.2.4",
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.4.1",
+    "vite": "^6.3.5",
+    "wrangler": "^4.20.5"
+  },
+  "type": "module"
 }
