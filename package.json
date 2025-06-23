@@ -34,7 +34,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "wrangler": "^3.0.0",
+    "wrangler": "^4.20.5",
     "@cloudflare/puppeteer": "^1.0.2",
     "@cloudflare/workers-types": "^4.20241127.0",
     "@cloudflare/vite-plugin": "^1.2.4",

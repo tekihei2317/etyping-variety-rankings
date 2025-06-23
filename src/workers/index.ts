@@ -4,7 +4,6 @@
  */
 
 import { Hono } from "hono";
-import { cors } from "hono/cors";
 
 // 型定義をインポート
 interface RankingEntry {
@@ -32,9 +31,6 @@ interface Env {
 }
 
 const app = new Hono<{ Bindings: Env }>();
-
-// CORS設定
-app.use("*", cors());
 
 // ダミーデータ（実際のJSONファイルの代替）
 const getDummyRankingData = (): RankingData[] => [
