@@ -49,7 +49,7 @@ describe("hasEtypingScore", () => {
     const result = await hasEtypingScore({
       userData,
       fetchRankingByPage: fetchRankingByPageDummy,
-      pageNum,
+      pageCount: pageNum,
     });
 
     expect(result).toBe(true);
@@ -60,7 +60,7 @@ describe("hasEtypingScore", () => {
     const result = await hasEtypingScore({
       userData,
       fetchRankingByPage: fetchRankingByPageDummy,
-      pageNum,
+      pageCount: pageNum,
     });
 
     expect(result).toBe(false);
@@ -71,7 +71,7 @@ describe("hasEtypingScore", () => {
     const result = await hasEtypingScore({
       userData,
       fetchRankingByPage: fetchRankingByPageDummy,
-      pageNum,
+      pageCount: pageNum,
     });
 
     expect(result).toBe(false);
@@ -82,7 +82,7 @@ describe("hasEtypingScore", () => {
     const result = await hasEtypingScore({
       userData,
       fetchRankingByPage: fetchRankingByPageDummy,
-      pageNum,
+      pageCount: pageNum,
     });
 
     expect(result).toBe(false);
@@ -93,14 +93,14 @@ describe("hasEtypingScore", () => {
     const result = await hasEtypingScore({
       userData,
       fetchRankingByPage: fetchRankingByPageDummy,
-      pageNum,
+      pageCount: pageNum,
     });
 
     const userData2: UserData = { userName: "i", score: 90 };
     const result2 = await hasEtypingScore({
       userData: userData2,
       fetchRankingByPage: fetchRankingByPageDummy,
-      pageNum,
+      pageCount: pageNum,
     });
 
     expect(result).toBe(true);
@@ -112,7 +112,7 @@ describe("hasEtypingScore", () => {
     const result = await hasEtypingScore({
       userData,
       fetchRankingByPage: fetchRankingByPageDummy,
-      pageNum,
+      pageCount: pageNum,
     });
 
     const userData2: UserData = { userName: "j", score: 90 };
@@ -121,12 +121,12 @@ describe("hasEtypingScore", () => {
     const result2 = await hasEtypingScore({
       userData: userData2,
       fetchRankingByPage: fetchRankingByPageDummy,
-      pageNum,
+      pageCount: pageNum,
     });
     const result3 = await hasEtypingScore({
       userData: userData3,
       fetchRankingByPage: fetchRankingByPageDummy,
-      pageNum,
+      pageCount: pageNum,
     });
 
     expect(result).toBe(true);

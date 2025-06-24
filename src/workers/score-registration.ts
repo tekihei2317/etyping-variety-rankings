@@ -5,7 +5,7 @@ export type FetchRankingByPage = (page: number) => Promise<RankingEntry[]>;
 type HasEtypingScoreInput = {
   userData: { userName: string; score: number };
   fetchRankingByPage: FetchRankingByPage;
-  pageNum: number;
+  pageCount: number;
 };
 
 /**
@@ -14,11 +14,11 @@ type HasEtypingScoreInput = {
 async function findPageByScore({
   score,
   fetchRankingByPage,
-  pageNum,
+  pageCount: pageNum,
 }: {
   score: number;
   fetchRankingByPage: FetchRankingByPage;
-  pageNum: number;
+  pageCount: number;
 }): Promise<number> {
   // min(pageのスコア) <= scoreとなる最小のpageを求める
   // 1-indexed
@@ -56,14 +56,14 @@ function userDataExists(
 export async function hasEtypingScore({
   userData,
   fetchRankingByPage,
-  pageNum,
+  pageCount,
 }: HasEtypingScoreInput): Promise<boolean> {
   const page = await findPageByScore({
     score: userData.score,
     fetchRankingByPage,
-    pageNum,
+    pageCount,
   });
-  if (page === pageNum + 1) {
+  if (page === pageCount + 1) {
     // ランキングにあるスコアの最小値より小さい値を指定した場合
     return false;
   }
@@ -73,7 +73,7 @@ export async function hasEtypingScore({
 
   // ユーザーのスコアが対象のページのスコア最小値と同じ場合、次のページにある可能性もあるので探す
   const minScore = Math.min(...entries.map((entry) => entry.score));
-  if (userData.score === minScore && page < pageNum) {
+  if (userData.score === minScore && page < pageCount) {
     const entries = await fetchRankingByPage(page + 1);
     if (userDataExists(userData, entries)) return true;
   }

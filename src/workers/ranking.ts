@@ -90,37 +90,40 @@ export async function calculateTotalScoreRankingFromDB(
     FROM ranking_scores
     ORDER BY etyping_name, category
   `);
-  
-  const result = await stmt.all<Pick<RankingScoreRecord, 'etyping_name' | 'category' | 'score'>>();
-  
+
+  const result =
+    await stmt.all<
+      Pick<RankingScoreRecord, "etyping_name" | "category" | "score">
+    >();
+
   if (!result.success) {
     throw new Error("Failed to fetch ranking data from database");
   }
-  
+
   const userScores = new Map<string, TotalRankingEntry>();
-  
+
   // カテゴリの日本語名から英語IDへのマッピング
   const categoryIdMap: Record<string, string> = {
-    "ビジネス": "business",
-    "スタディ": "study", 
-    "ライフ": "life",
-    "トラベル": "travel",
-    "スポーツ": "sports",
+    ビジネス: "business",
+    スタディ: "study",
+    ライフ: "life",
+    トラベル: "travel",
+    スポーツ: "sports",
     "なんだろな？": "what",
-    "脳トレ": "brain",
-    "方言": "dialect",
-    "長文": "long",
-    "テンキー": "tenkey",
-    "百人一首": "hyakunin",
-    "しりとり": "siritori",
-    "医療介護": "medical",
+    脳トレ: "brain",
+    方言: "dialect",
+    長文: "long",
+    テンキー: "tenkey",
+    百人一首: "hyakunin",
+    しりとり: "siritori",
+    医療介護: "medical",
   };
 
   // ユーザーごとにスコアを集計
   result.results.forEach((record) => {
     const categoryId = categoryIdMap[record.category] || record.category;
     const existing = userScores.get(record.etyping_name);
-    
+
     if (existing) {
       existing.totalScore += record.score;
       existing.categoryScores[categoryId] = record.score;

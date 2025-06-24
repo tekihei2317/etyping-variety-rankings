@@ -139,6 +139,34 @@ Sec-Fetch-Mode: navigateが付いてて、他のアセットにマッチしな�
 
 compapibility_dateを今日の日付に変えると動いた！スタイリングは崩れているのでCSSが効いていないっぽい。とりあえず先に進もう。気になってたことはここに書かれてるっぽいことがわかったのでヨシ。
 
+### `wrangler dev --remote`って自動で反映される？
+
+新しくAPIエンドポイントを作っても実行できずNot Foundになるので、ビルドし直さないといけないのかなと。devだから自動でビルドしてくれそうな気はするけど。
+
+### @cloudflare/puppeteerで、Session with given id not found.
+
+```txt
+Score registration request: tsato - study - 476
+Starting score registration for tsato in study
+Fetching e-typing ranking for study, page 4
+Navigating to: https://www.e-typing.ne.jp/ranking/index.asp?im=0&sc=variety&ct=study
+Moving to page 4
+Extracting ranking data...
+Extracted 30 ranking entries
+Fetching e-typing ranking for study, page 2
+[wrangler:info] POST /api/register-score 200 OK (10308ms)
+Error in registerUserScore: ProtocolError: Protocol error (Target.createTarget): Session with given id not found.
+    at <instance_members_initializer> (file:///Users/tekihei2317/ghq/github.com/tekihei2317/etyping-variety-rankings/dist/etyping_rankin
+```
+
+これよく分からなかった...。複数のBrowserを立ち上げてることが原因かなと思ったけど、一つのBrowserにしても起きたり起きなかったり。ドキュメントにsessionについて書かれているところがあったので読んでみよう。
+
+[Reuse sessions · Browser Rendering docs](https://developers.cloudflare.com/browser-rendering/workers-binding-api/reuse-sessions/)
+
+Browser render workerのパフォーマンスを上げる一番の方法はセッションを再利用すること。端的に言えば、`browser.close()`の代わりに`browser.disconnect()`を使い、再接続する場合は`puppeteer.connect(browser, sessionId)`を使う。
+
+この実装を参考に、今の実装を修正してみよう。
+
 ### その他
 
 [Wrangler · Browser Rendering docs](https://developers.cloudflare.com/browser-rendering/platform/wrangler/)

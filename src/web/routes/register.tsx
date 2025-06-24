@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { apiClient } from "../libs/api-client";
 
 // e-typingバラエティの種目一覧
 const categories = [
@@ -47,16 +48,33 @@ function RouteComponent() {
     setMessage("");
 
     try {
-      // TODO: API呼び出しを実装
-      console.log({
-        category: selectedCategory,
-        username,
-        score: scoreNum,
+      const response = await apiClient.api["register-score"].$post({
+        json: {
+          categoryId: selectedCategory,
+          username: username,
+          score: scoreNum,
+        },
       });
 
-      setMessage("スコア登録処理を開始しました（機能は開発中です）");
+      if (!response.ok) {
+        throw new Error("API request failed");
+      }
+
+      // const result = await response.json();
+
+      // if (result.success) {
+      //   setMessage(`✅ ${result.message}`);
+      //   // フォームをリセット
+      //   setSelectedCategory("");
+      //   setUsername("");
+      //   setScore("");
+      // } else {
+      //   setMessage(`❌ ${result.message}`);
+      // }
     } catch (error) {
-      setMessage("エラーが発生しました");
+      setMessage(
+        "❌ エラーが発生しました。しばらく時間をおいてから再度お試しください。"
+      );
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -131,7 +149,9 @@ function RouteComponent() {
         {message && (
           <div
             className={`px-4 py-3 rounded-md ${
-              message.includes("エラー") || message.includes("入力してください")
+              message.includes("❌") ||
+              message.includes("エラー") ||
+              message.includes("入力してください")
                 ? "bg-red-50 text-red-700 border border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700"
                 : "bg-green-50 text-green-700 border border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700"
             }`}
@@ -146,7 +166,7 @@ function RouteComponent() {
             disabled={isLoading}
             className="w-full px-6 py-3 bg-purple-600 text-white font-medium rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
           >
-            {isLoading ? "確認中..." : "スコアを登録"}
+            {isLoading ? "e-typingで確認中..." : "スコアを登録"}
           </button>
         </div>
       </form>
