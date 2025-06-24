@@ -24,9 +24,9 @@ export const Route = createFileRoute("/register")({
 });
 
 function RouteComponent() {
-  const [selectedCategory, setSelectedCategory] = useState("business");
-  const [username, setUsername] = useState("tsato");
-  const [score, setScore] = useState("540");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [username, setUsername] = useState("");
+  const [score, setScore] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -164,7 +164,14 @@ function RouteComponent() {
             disabled={isLoading}
             className="w-full px-6 py-3 bg-purple-600 text-white font-medium rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
           >
-            {isLoading ? "e-typingで確認中..." : "スコアを登録"}
+            {isLoading ? (
+              <div className="flex items-center justify-center space-x-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>e-typingで確認中...</span>
+              </div>
+            ) : (
+              "スコアを登録"
+            )}
           </button>
         </div>
       </form>
