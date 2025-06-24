@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { rankings } from "../data/ranking";
-import { calculateTotalScoreRanking } from "./ranking";
+import { calculateTotalScoreRanking, calculateTotalScoreRankingFromDB } from "./ranking";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 
@@ -30,7 +30,34 @@ const rankingQuery = z.object({
 });
 
 const apiApp = new Hono<{ Bindings: Env }>()
-  .get("/ranking", zValidator("query", rankingQuery), (c) => {
+  .get("/ranking", zValidator("query", rankingQuery), async (c) => {
+    const { page } = c.req.valid("query");
+    const pageSize = 50;
+
+    try {
+      const totalRanking = await calculateTotalScoreRankingFromDB(c.env.DB);
+      const totalCount = totalRanking.length;
+      const totalPages = Math.ceil(totalCount / pageSize);
+
+      const startIndex = (page - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      const pageData = totalRanking.slice(startIndex, endIndex);
+
+      return c.json({
+        totalRanking: pageData,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalCount,
+          pageSize,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching ranking data:", error);
+      return c.json({ error: "Failed to fetch ranking data" }, 500);
+    }
+  })
+  .get("/ranking/legacy", zValidator("query", rankingQuery), (c) => {
     const { page } = c.req.valid("query");
     const pageSize = 50;
 

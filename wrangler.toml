@@ -5,6 +5,11 @@ compatibility_date = "2024-09-23"
 
 browser = { binding = "MYBROWSER" }
 
+[[d1_databases]]
+binding = "DB"
+database_name = "e-typing-variety-rankings"
+database_id = "0852d5b4-268d-4c2f-9c78-57a7c0e4feaa"
+
 [env.production]
 name = "etyping-ranking-api"
 
