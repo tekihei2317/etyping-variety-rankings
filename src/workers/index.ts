@@ -7,6 +7,7 @@ import {
 import { getUserDetails, userParamSchema } from "./user";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
+import { registerUserScore } from "./register";
 
 const categories = [
   { id: "business", name: "ビジネス" },
@@ -31,6 +32,16 @@ const rankingQuery = z.object({
     .pipe(z.number().min(1))
     .optional()
     .default("1"),
+});
+
+const scoreRegistrationSchema = z.object({
+  categoryId: z
+    .string()
+    .refine((val) => categories.some((cat) => cat.id === val), {
+      message: "Invalid category ID",
+    }),
+  username: z.string().min(1, "Username is required"),
+  score: z.number().min(1, "Score must be a positive number"),
 });
 
 const apiApp = new Hono<{ Bindings: Env }>()
@@ -97,7 +108,26 @@ const apiApp = new Hono<{ Bindings: Env }>()
       console.error("Error fetching user data:", error);
       return c.json({ error: "Failed to fetch user data" }, 500);
     }
-  });
+  })
+  .get("/register", async (c) => {
+    return c.json({ message: "register" });
+  })
+  .post(
+    "/register-score",
+    zValidator("json", scoreRegistrationSchema),
+    async (c) => {
+      const { categoryId, username, score } = c.req.valid("json");
+
+      const result = await registerUserScore({
+        browser: c.env.MYBROWSER,
+        db: c.env.DB,
+        categoryId,
+        userData: { userName: username, score },
+      });
+
+      return c.json(result, result.statusCode);
+    }
+  );
 
 const app = new Hono().route("/api", apiApp);
 

@@ -73,20 +73,19 @@ function App() {
   };
 
   if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto px-5 text-left">
-        <h1 className="text-3xl font-bold mb-4">e-typing バラエティ ランキング</h1>
-        <p>読み込み中...</p>
-      </div>
-    );
+    return <p>読み込み中...</p>;
   }
 
   if (error) {
     return (
       <div className="max-w-4xl mx-auto px-5 text-left">
-        <h1 className="text-3xl font-bold mb-4">e-typing バラエティ 総合ランキング</h1>
-        <p className="text-red-600 bg-red-50 px-2.5 py-2.5 rounded border border-red-200">エラー: {error}</p>
-        <button 
+        <h1 className="text-3xl font-bold mb-4">
+          e-typing バラエティ 総合ランキング
+        </h1>
+        <p className="text-red-600 bg-red-50 px-2.5 py-2.5 rounded border border-red-200">
+          エラー: {error}
+        </p>
+        <button
           onClick={() => fetchRanking(currentPage)}
           className="mt-4 px-4 py-2 border border-gray-300 bg-white text-gray-700 cursor-pointer rounded transition-colors duration-200 hover:bg-gray-50"
         >
@@ -98,8 +97,22 @@ function App() {
 
   return (
     <div className="max-w-4xl mx-auto px-5 text-left">
-      <h1 className="text-3xl font-bold mb-4">e-typing バラエティ 総合ランキング</h1>
-      <p className="mb-4">バラエティ全13種目の合計スコアランキング</p>
+      {/* 更新情報 */}
+      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-sm mb-5">
+        <div className="flex flex-wrap items-center gap-4 text-gray-600 dark:text-gray-400">
+          <span>📅 最終更新: 2025年6月23日</span>
+          <span>🔄 更新頻度: 週1回（日曜日）</span>
+          <span>
+            <Link
+              to="/register"
+              className="text-purple-600 hover:text-purple-800 hover:underline dark:text-purple-400 dark:hover:text-purple-300 ml-1"
+            >
+              スコアを登録する
+            </Link>
+            （定期更新以外でスコアを更新したい場合）
+          </span>
+        </div>
+      </div>
 
       <div className="my-5 px-2.5 py-2.5 bg-gray-100 rounded text-sm dark:bg-gray-800 dark:text-white">
         <p>
@@ -127,10 +140,15 @@ function App() {
         <tbody>
           {ranking.map((entry, index) => {
             return (
-              <tr key={entry.username} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100 dark:${index % 2 === 0 ? 'bg-gray-900' : 'bg-gray-800'} dark:hover:bg-gray-700`}>
-                <td className="px-4 py-3 border-b border-gray-300 font-semibold text-center w-20 dark:border-gray-600">{entry.rank}</td>
+              <tr
+                key={entry.username}
+                className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 dark:${index % 2 === 0 ? "bg-gray-900" : "bg-gray-800"} dark:hover:bg-gray-700`}
+              >
+                <td className="px-4 py-3 border-b border-gray-300 font-semibold text-center w-20 dark:border-gray-600">
+                  {entry.rank}
+                </td>
                 <td className="px-4 py-3 border-b border-gray-300 dark:border-gray-600">
-                  <Link 
+                  <Link
                     to="/user/$username"
                     params={{ username: entry.username }}
                     className="text-purple-600 no-underline font-medium transition-colors duration-200 hover:text-purple-800 hover:underline dark:text-purple-400 dark:hover:text-purple-300"
@@ -138,8 +156,12 @@ function App() {
                     {entry.username}
                   </Link>
                 </td>
-                <td className="px-4 py-3 border-b border-gray-300 text-right dark:border-gray-600">{entry.totalScore.toLocaleString()}</td>
-                <td className="px-4 py-3 border-b border-gray-300 text-right dark:border-gray-600">{entry.categoriesPlayed}</td>
+                <td className="px-4 py-3 border-b border-gray-300 text-right dark:border-gray-600">
+                  {entry.totalScore.toLocaleString()}
+                </td>
+                <td className="px-4 py-3 border-b border-gray-300 text-right dark:border-gray-600">
+                  {entry.categoriesPlayed}
+                </td>
               </tr>
             );
           })}
@@ -167,20 +189,6 @@ function App() {
         >
           次のページ
         </button>
-      </div>
-
-      <div className="mt-10 pt-5 border-t border-gray-300 text-center text-gray-600 text-sm dark:border-gray-600 dark:text-gray-400">
-        <p>
-          データ取得元:{" "}
-          <a
-            href="https://www.e-typing.ne.jp/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-purple-600 no-underline hover:underline dark:text-purple-400"
-          >
-            e-typing
-          </a>
-        </p>
       </div>
     </div>
   );

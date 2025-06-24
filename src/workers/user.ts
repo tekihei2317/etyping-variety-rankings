@@ -29,19 +29,19 @@ export interface UserDetails {
 
 // カテゴリの日本語名から英語IDへのマッピング
 const categoryIdMap: Record<string, string> = {
-  "ビジネス": "business",
-  "スタディ": "study", 
-  "ライフ": "life",
-  "トラベル": "travel",
-  "スポーツ": "sports",
+  ビジネス: "business",
+  スタディ: "study",
+  ライフ: "life",
+  トラベル: "travel",
+  スポーツ: "sports",
   "なんだろな？": "what",
-  "脳トレ": "brain",
-  "方言": "dialect",
-  "長文": "long",
-  "テンキー": "tenkey",
-  "百人一首": "hyakunin",
-  "しりとり": "siritori",
-  "医療介護": "medical",
+  脳トレ: "brain",
+  方言: "dialect",
+  長文: "long",
+  テンキー: "tenkey",
+  百人一首: "hyakunin",
+  しりとり: "siritori",
+  医療介護: "medical",
 };
 
 const categories = [
@@ -60,29 +60,32 @@ const categories = [
   { id: "medical", name: "医療介護" },
 ];
 
-export async function getUserDetails(db: D1Database, username: string): Promise<UserDetails> {
+export async function getUserDetails(
+  db: D1Database,
+  username: string
+): Promise<UserDetails> {
   // データベースから特定ユーザーの全種目スコアを取得
   const stmt = db.prepare(`
-    SELECT 
+    SELECT
       category,
       score,
       theme,
       fetched_at
-    FROM ranking_scores 
-    WHERE etyping_name = ? 
+    FROM ranking_scores
+    WHERE etyping_name = ?
     ORDER BY category
   `);
-  
+
   const result = await stmt.bind(username).all();
-  
+
   if (!result.success) {
     throw new Error("Failed to fetch user data from database");
   }
-  
+
   // スコアデータを整理
   const categoryScores: Record<string, UserCategoryScore> = {};
   let totalScore = 0;
-  
+
   result.results.forEach((record: any) => {
     const categoryId = categoryIdMap[record.category] || record.category;
     categoryScores[categoryId] = {
@@ -92,17 +95,17 @@ export async function getUserDetails(db: D1Database, username: string): Promise<
     };
     totalScore += record.score;
   });
-  
+
   // 全カテゴリの情報を含むレスポンスを作成
   return {
     username,
     totalScore,
     categoriesPlayed: Object.keys(categoryScores).length,
-    categories: categories.map(category => ({
+    categories: categories.map((category) => ({
       ...category,
       score: categoryScores[category.id]?.score || null,
       theme: categoryScores[category.id]?.theme || null,
       fetchedAt: categoryScores[category.id]?.fetchedAt || null,
-    }))
+    })),
   };
 }
