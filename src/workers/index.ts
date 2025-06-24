@@ -7,7 +7,7 @@ import {
 import { getUserDetails, userParamSchema } from "./user";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
-import { registerUserScore } from "./etyping-fetcher";
+import { registerUserScore } from "./register";
 
 const categories = [
   { id: "business", name: "ビジネス" },

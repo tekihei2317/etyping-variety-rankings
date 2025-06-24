@@ -92,90 +92,63 @@ export function createEtypingFetcher({
 }
 
 /**
- * スコア登録処理のメイン関数
+ * e-typingのランキングの中に、ユーザーデータが存在するか確認する
  */
-export interface RegisterScoreInput {
+export async function checkIfScoreExistsInEtyping({
+  browser,
+  categoryId,
+  userData,
+}: {
   browser: Fetcher;
   categoryId: string;
   userData: { userName: string; score: number };
-}
-
-export async function registerUserScore(input: RegisterScoreInput): Promise<{
-  success: boolean;
-  message: string;
-  found?: boolean;
-}> {
-  const { browser, categoryId, userData } = input;
+}): Promise<boolean> {
   const puppeteerBrowser = await getBrowser(browser);
 
-  try {
-    console.log(
-      `Stajting score registration for ${userData.userName} in ${categoryId}`
-    );
+  // ページを作成する
+  console.log("Creating new page...");
+  const page = await puppeteerBrowser.newPage();
+  console.log("Page created successfully");
 
-    console.log("Creating new page...");
-    const page = await puppeteerBrowser.newPage();
-    console.log("Page created successfully");
+  // e-typingページに移動
+  console.log("Navigating to e-typing page...");
+  const baseUrl = CATEGORY_URLS[categoryId];
+  await page.goto(baseUrl, {
+    waitUntil: "domcontentloaded",
+  });
+  console.log("Navigation completed");
 
-    // e-typingページに移動
-    console.log("Navigating to e-typing page...");
-    const baseUrl = CATEGORY_URLS[categoryId];
-    await page.goto(baseUrl, {
-      waitUntil: "domcontentloaded",
-    });
-    console.log("Navigation completed");
+  // JavaScriptが実行されるまで待つ
+  console.log("Waiting for JavaScript to load...");
+  await page.waitForFunction(
+    () => {
+      return (
+        typeof (window as any).ps_page_max !== "undefined" &&
+        typeof (window as any).ps_page_move === "function"
+      );
+    },
+    { timeout: 5000 }
+  );
+  console.log("JavaScript functions are now available");
 
-    // JavaScriptが実行されるまで待つ
-    console.log("Waiting for JavaScript to load...");
-    await page.waitForFunction(
-      () => {
-        return (
-          typeof (window as any).ps_page_max !== "undefined" &&
-          typeof (window as any).ps_page_move === "function"
-        );
-      },
-      { timeout: 5000 }
-    );
-    console.log("JavaScript functions are now available");
+  // ページ数を取得する
+  const pageCount = await page.evaluate(() => (window as any).ps_page_max);
+  console.log(`${pageCount} pages found`);
 
-    // ページ数を取得する
-    const pageCount = await page.evaluate(() => (window as any).ps_page_max);
-    console.log(`${pageCount} pages found`);
+  // ユーザーデータがランキングに存在するか確かめる
+  const fetchRankingByPage = createEtypingFetcher({
+    browserPage: page,
+    categoryId,
+  });
 
-    // ユーザーデータがランキングに存在するか確かめる
-    const fetchRankingByPage = createEtypingFetcher({
-      browserPage: page,
-      categoryId,
-    });
-    const found = await hasEtypingScore({
-      userData,
-      fetchRankingByPage,
-      pageCount,
-    });
+  const found = await hasEtypingScore({
+    userData,
+    fetchRankingByPage,
+    pageCount,
+  });
 
-    if (!found) {
-      return {
-        success: false,
-        message:
-          "指定されたユーザー名とスコアの組み合わせがe-typingのランキングに見つかりませんでした",
-        found: false,
-      };
-    }
-    console.log("Score found in e-typing ranking:", userData);
+  // 接続を切る
+  puppeteerBrowser.disconnect();
 
-    puppeteerBrowser.disconnect();
-
-    return {
-      success: true,
-      message:
-        "スコアがe-typingで確認できました（データベース登録処理は未実装）",
-      found: true,
-    };
-  } catch (error) {
-    console.error("Error in registerUserScore:", error);
-    return {
-      success: false,
-      message: `エラーが発生しました: ${error instanceof Error ? error.message : "Unknown error"}`,
-    };
-  }
+  return found;
 }
