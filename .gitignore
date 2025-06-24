@@ -4,3 +4,4 @@ node_modules
 .wrangler
 my-hono-app
 dist
+.tanstack

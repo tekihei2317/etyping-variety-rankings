@@ -1,6 +1,10 @@
 import { Hono } from "hono";
 import { rankings } from "../data/ranking";
-import { calculateTotalScoreRanking, calculateTotalScoreRankingFromDB } from "./ranking";
+import {
+  calculateTotalScoreRanking,
+  calculateTotalScoreRankingFromDB,
+} from "./ranking";
+import { getUserDetails, userParamSchema } from "./user";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 
@@ -81,9 +85,22 @@ const apiApp = new Hono<{ Bindings: Env }>()
   })
   .get("/categories", (c) => {
     return c.json({ categories });
+  })
+  .get("/user/:username", zValidator("param", userParamSchema), async (c) => {
+    const { username } = c.req.valid("param");
+    const decodedUsername = decodeURIComponent(username);
+
+    try {
+      const userDetails = await getUserDetails(c.env.DB, decodedUsername);
+      return c.json(userDetails);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return c.json({ error: "Failed to fetch user data" }, 500);
+    }
   });
 
 const app = new Hono().route("/api", apiApp);
+
 export type AppType = typeof app;
 
 export default app;

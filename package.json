@@ -25,12 +25,15 @@
   "homepage": "https://github.com/tekihei2317/etyping-variety-rankings#readme",
   "dependencies": {
     "@hono/zod-validator": "^0.7.0",
+    "@tailwindcss/vite": "^4.1.10",
+    "@tanstack/react-router": "^1.121.34",
     "@types/node": "^24.0.3",
     "cheerio": "^1.1.0",
     "hono": "^4.7.7",
     "puppeteer": "^24.10.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "tailwindcss": "^4.1.10",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "zod": "^3.25.67"
@@ -39,6 +42,7 @@
     "@cloudflare/puppeteer": "^1.0.2",
     "@cloudflare/vite-plugin": "^1.2.4",
     "@cloudflare/workers-types": "^4.20241127.0",
+    "@tanstack/router-plugin": "^1.121.34",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.4.1",
