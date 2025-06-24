@@ -118,37 +118,14 @@ const apiApp = new Hono<{ Bindings: Env }>()
     async (c) => {
       const { categoryId, username, score } = c.req.valid("json");
 
-      try {
-        console.log(
-          `Score registration request: ${username} - ${categoryId} - ${score}`
-        );
+      const result = await registerUserScore({
+        browser: c.env.MYBROWSER,
+        db: c.env.DB,
+        categoryId,
+        userData: { userName: username, score },
+      });
 
-        // TODO: 既に登録済みかどうかをチェック
-        // const existingScore = await checkExistingScore(c.env.DB, username, categoryId);
-        // if (existingScore) {
-        //   return c.json({
-        //     success: false,
-        //     message: "このスコアは既に登録済みです"
-        //   }, 400);
-        // }
-
-        const result = await registerUserScore({
-          browser: c.env.MYBROWSER,
-          categoryId,
-          userData: { userName: username, score },
-        });
-
-        return c.json(result);
-      } catch (error) {
-        console.error("Error in score registration:", error);
-        return c.json(
-          {
-            success: false,
-            message: `サーバーエラーが発生しました: ${error instanceof Error ? error.message : "Unknown error"}`,
-          },
-          500
-        );
-      }
+      return c.json(result, result.statusCode);
     }
   );
 
