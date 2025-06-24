@@ -24,9 +24,9 @@ export const Route = createFileRoute("/register")({
 });
 
 function RouteComponent() {
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [username, setUsername] = useState("");
-  const [score, setScore] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("business");
+  const [username, setUsername] = useState("tsato");
+  const [score, setScore] = useState("540");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -56,26 +56,24 @@ function RouteComponent() {
         },
       });
 
-      if (!response.ok) {
-        throw new Error("API request failed");
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setMessage(`✅ ${result.message}`);
+        // フォームをリセット
+        setSelectedCategory("");
+        setUsername("");
+        setScore("");
+      } else {
+        // 400エラーなどのAPIエラーの場合
+        setMessage(`❌ ${result.message || "登録に失敗しました"}`);
       }
-
-      // const result = await response.json();
-
-      // if (result.success) {
-      //   setMessage(`✅ ${result.message}`);
-      //   // フォームをリセット
-      //   setSelectedCategory("");
-      //   setUsername("");
-      //   setScore("");
-      // } else {
-      //   setMessage(`❌ ${result.message}`);
-      // }
     } catch (error) {
+      console.error("Score registration error:", error);
+      // ネットワークエラーやその他の予期しないエラー
       setMessage(
-        "❌ エラーが発生しました。しばらく時間をおいてから再度お試しください。"
+        "❌ サーバーエラーが発生しました。しばらく時間をおいてから再度お試しください。"
       );
-      console.error(error);
     } finally {
       setIsLoading(false);
     }

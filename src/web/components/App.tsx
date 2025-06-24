@@ -73,14 +73,7 @@ function App() {
   };
 
   if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto px-5 text-left">
-        <h1 className="text-3xl font-bold mb-4">
-          e-typing バラエティ ランキング
-        </h1>
-        <p>読み込み中...</p>
-      </div>
-    );
+    return <p>読み込み中...</p>;
   }
 
   if (error) {
