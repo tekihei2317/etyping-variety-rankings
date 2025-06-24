@@ -1,6 +1,9 @@
 import { Hono } from "hono";
 import { rankings } from "../data/ranking";
-import { calculateTotalScoreRanking, calculateTotalScoreRankingFromDB } from "./ranking";
+import {
+  calculateTotalScoreRanking,
+  calculateTotalScoreRankingFromDB,
+} from "./ranking";
 import { getUserDetails, userParamSchema } from "./user";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
@@ -86,7 +89,7 @@ const apiApp = new Hono<{ Bindings: Env }>()
   .get("/user/:username", zValidator("param", userParamSchema), async (c) => {
     const { username } = c.req.valid("param");
     const decodedUsername = decodeURIComponent(username);
-    
+
     try {
       const userDetails = await getUserDetails(c.env.DB, decodedUsername);
       return c.json(userDetails);
@@ -97,6 +100,7 @@ const apiApp = new Hono<{ Bindings: Env }>()
   });
 
 const app = new Hono().route("/api", apiApp);
+
 export type AppType = typeof app;
 
 export default app;
