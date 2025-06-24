@@ -8,6 +8,7 @@
 - Honoで作成したAPIを、クライアント（React）からアクセスするにはどうすればいいか
 - HonoのRPCのドキュメント見てるけど、複数のエンドポイントある場合の書き方が分からない
 - Cloudflare D1の基本的な使い方を調べる。マイグレーションを本番DBに反映する方法とか覚えてない。
+- Tanstack Routerで`src/routes`じゃなくて`src/web/routes`にしたい場合は？
 
 ### Cloudflareのpuppeteerのドキュメントがあったので読もう
 
@@ -58,6 +59,10 @@ wrangler d1 migrations apply <database_name> --local
 # マイグレーションのリスト（実行されていないもののみ）
 wrangler d1 migrations list <database_name> --local
 ```
+
+### Tanstack Routerで`src/routes`じゃなくて`src/web/routes`にしたい場合は？
+
+`routesDirectory`っていうオプションがあったから指定した。ドキュメントは読んでない。
 
 ### その他
 

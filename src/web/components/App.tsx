@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { hc } from "hono/client";
-import type { AppType } from "../workers/index";
-import "./App.css";
+import { Link } from "@tanstack/react-router";
+import type { AppType } from "../../workers/index";
+import "../App.css";
 
 const client = hc<AppType>("/");
 
@@ -116,7 +117,15 @@ function App() {
             return (
               <tr key={entry.username}>
                 <td>{entry.rank}</td>
-                <td>{entry.username}</td>
+                <td>
+                  <Link 
+                    to="/user/$username"
+                    params={{ username: entry.username }}
+                    className="user-link"
+                  >
+                    {entry.username}
+                  </Link>
+                </td>
                 <td>{entry.totalScore.toLocaleString()}</td>
                 <td>{entry.categoriesPlayed}</td>
               </tr>

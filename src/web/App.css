@@ -118,6 +118,18 @@
   border: 1px solid #f1c6c6;
 }
 
+.user-link {
+  color: #646cff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.user-link:hover {
+  color: #535bf2;
+  text-decoration: underline;
+}
+
 @media (prefers-color-scheme: dark) {
   .ranking-info {
     background-color: #333;
@@ -166,5 +178,13 @@
     background-color: #2d1b1b;
     color: #ff6b6b;
     border-color: #4a2525;
+  }
+
+  .user-link {
+    color: #8b95ff;
+  }
+
+  .user-link:hover {
+    color: #a4a9ff;
   }
 }
