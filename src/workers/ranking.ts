@@ -1,5 +1,15 @@
 import type { Rankings } from "../data/ranking";
 
+interface RankingScoreRecord {
+  id: number;
+  fetched_at: string;
+  category: string;
+  theme: string;
+  etyping_name: string;
+  score: number;
+  created_at: string;
+}
+
 interface TotalRankingEntry {
   username: string;
   totalScore: number;
@@ -53,6 +63,92 @@ export function calculateTotalScoreRanking(
     const prevUser = sortedUsers[i - 1];
 
     // If this user has the same score as the previous user, use the same rank
+    if (prevUser && user.totalScore === prevUser.totalScore) {
+      // Keep the same rank as previous user
+    } else {
+      currentRank = i + 1;
+    }
+
+    rankedUsers.push({
+      ...user,
+      rank: currentRank,
+    });
+  }
+
+  return rankedUsers;
+}
+
+export async function calculateTotalScoreRankingFromDB(
+  db: D1Database
+): Promise<TotalRankingEntryWithRank[]> {
+  // データベースから全ランキングデータを取得
+  const stmt = db.prepare(`
+    SELECT 
+      etyping_name,
+      category,
+      score
+    FROM ranking_scores
+    ORDER BY etyping_name, category
+  `);
+  
+  const result = await stmt.all<Pick<RankingScoreRecord, 'etyping_name' | 'category' | 'score'>>();
+  
+  if (!result.success) {
+    throw new Error("Failed to fetch ranking data from database");
+  }
+  
+  const userScores = new Map<string, TotalRankingEntry>();
+  
+  // カテゴリの日本語名から英語IDへのマッピング
+  const categoryIdMap: Record<string, string> = {
+    "ビジネス": "business",
+    "スタディ": "study", 
+    "ライフ": "life",
+    "トラベル": "travel",
+    "スポーツ": "sports",
+    "なんだろな？": "what",
+    "脳トレ": "brain",
+    "方言": "dialect",
+    "長文": "long",
+    "テンキー": "tenkey",
+    "百人一首": "hyakunin",
+    "しりとり": "siritori",
+    "医療介護": "medical",
+  };
+
+  // ユーザーごとにスコアを集計
+  result.results.forEach((record) => {
+    const categoryId = categoryIdMap[record.category] || record.category;
+    const existing = userScores.get(record.etyping_name);
+    
+    if (existing) {
+      existing.totalScore += record.score;
+      existing.categoryScores[categoryId] = record.score;
+      existing.categoriesPlayed += 1;
+    } else {
+      userScores.set(record.etyping_name, {
+        username: record.etyping_name,
+        totalScore: record.score,
+        categoryScores: { [categoryId]: record.score },
+        categoriesPlayed: 1,
+      });
+    }
+  });
+
+  // 配列に変換してトータルスコアで降順ソート
+  const sortedUsers = Array.from(userScores.values()).sort(
+    (a, b) => b.totalScore - a.totalScore
+  );
+
+  // ランクを追加（同順位の処理を含む）
+  const rankedUsers: TotalRankingEntryWithRank[] = [];
+  let currentRank = 1;
+
+  for (let i = 0; i < sortedUsers.length; i++) {
+    const user = sortedUsers[i];
+    const prevUser = sortedUsers[i - 1];
+
+    // 前のユーザーと同じスコアの場合は同じランクを使用
     if (prevUser && user.totalScore === prevUser.totalScore) {
       // Keep the same rank as previous user
     } else {
