@@ -25,6 +25,7 @@
   "homepage": "https://github.com/tekihei2317/etyping-variety-rankings#readme",
   "dependencies": {
     "@hono/zod-validator": "^0.7.0",
+    "@tailwindcss/vite": "^4.1.10",
     "@tanstack/react-router": "^1.121.34",
     "@types/node": "^24.0.3",
     "cheerio": "^1.1.0",
@@ -32,6 +33,7 @@
     "puppeteer": "^24.10.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "tailwindcss": "^4.1.10",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "zod": "^3.25.67"

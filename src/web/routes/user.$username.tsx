@@ -17,6 +17,25 @@ interface UserDetails {
   categories: UserCategory[];
 }
 
+function getCategoryUrl(categoryId: string): string {
+  const categoryUrls: Record<string, string> = {
+    business: "https://www.e-typing.ne.jp/roma/variety/business.asp",
+    study: "https://www.e-typing.ne.jp/roma/variety/study.asp",
+    life: "https://www.e-typing.ne.jp/roma/variety/life.asp",
+    travel: "https://www.e-typing.ne.jp/roma/variety/travel.asp",
+    sports: "https://www.e-typing.ne.jp/roma/variety/sports.asp",
+    what: "https://www.e-typing.ne.jp/roma/variety/what.asp",
+    brain: "https://www.e-typing.ne.jp/roma/variety/brain.asp",
+    dialect: "https://www.e-typing.ne.jp/roma/variety/dialect.asp",
+    long: "https://www.e-typing.ne.jp/roma/variety/long.asp",
+    tenkey: "https://www.e-typing.ne.jp/roma/variety/tenkey.asp",
+    hyakunin: "https://www.e-typing.ne.jp/roma/variety/hyakunin.asp",
+    siritori: "https://www.e-typing.ne.jp/roma/variety/siritori.asp",
+    medical: "https://www.e-typing.ne.jp/roma/variety/medical.asp",
+  };
+  return categoryUrls[categoryId] || "https://www.e-typing.ne.jp/";
+}
+
 export const Route = createFileRoute("/user/$username")({
   component: RouteComponent,
 });
@@ -54,7 +73,7 @@ function RouteComponent() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-5 text-left">
         <div className="text-center">Loading...</div>
       </div>
     );
@@ -62,108 +81,92 @@ function RouteComponent() {
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center text-red-600">Error: {error}</div>
+      <div className="max-w-4xl mx-auto px-5 text-left">
+        <div className="text-red-600 bg-red-50 px-2.5 py-2.5 rounded border border-red-200">
+          Error: {error}
+        </div>
       </div>
     );
   }
 
   if (!userDetails) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-5 text-left">
         <div className="text-center">User not found</div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">
+    <div className="max-w-4xl mx-auto px-5 text-left">
+      <div>
+        <h1 className="text-2xl font-bold mb-4">
           {userDetails.username} のスコア詳細
         </h1>
-        <div className="bg-blue-50 rounded-lg p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
-                {userDetails.totalScore}
-              </div>
-              <div className="text-sm text-gray-600">総合スコア</div>
+        <div className="my-5 px-2.5 py-2.5 bg-gray-100 rounded text-sm flex justify-around text-center dark:bg-gray-800 dark:text-white">
+          <div>
+            <div className="text-xl font-bold">{userDetails.totalScore}</div>
+            <div>総合スコア</div>
+          </div>
+          <div>
+            <div className="text-xl font-bold">
+              {userDetails.categoriesPlayed}
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
-                {userDetails.categoriesPlayed}
-              </div>
-              <div className="text-sm text-gray-600">プレイ種目数</div>
+            <div>プレイ種目数</div>
+          </div>
+          <div>
+            <div className="text-xl font-bold">
+              {13 - userDetails.categoriesPlayed}
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
-                {13 - userDetails.categoriesPlayed}
-              </div>
-              <div className="text-sm text-gray-600">未プレイ種目数</div>
-            </div>
+            <div>未プレイ種目数</div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="px-6 py-4 bg-gray-50 border-b">
-          <h2 className="text-xl font-semibold">種目別スコア</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  種目
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  お題
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  スコア
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  状態
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {userDetails.categories.map((category) => (
-                <tr
-                  key={category.id}
-                  className={category.score ? "bg-white" : "bg-gray-50"}
+      <table className="w-full border-collapse my-5 text-sm">
+        <thead>
+          <tr>
+            <th className="px-4 py-3 text-left border-b border-gray-300 bg-gray-100 font-semibold sticky top-0 z-10 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+              種目
+            </th>
+            <th className="px-4 py-3 text-left border-b border-gray-300 bg-gray-100 font-semibold sticky top-0 z-10 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+              お題
+            </th>
+            <th className="px-4 py-3 text-left border-b border-gray-300 bg-gray-100 font-semibold sticky top-0 z-10 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+              スコア
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {userDetails.categories.map((category, index) => (
+            <tr
+              key={category.id}
+              className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 dark:${index % 2 === 0 ? "bg-gray-900" : "bg-gray-800"} dark:hover:bg-gray-700`}
+            >
+              <td className="px-4 py-3 border-b border-gray-300 dark:border-gray-600">
+                <a
+                  href={getCategoryUrl(category.id)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-600 no-underline font-medium transition-colors duration-200 hover:text-purple-800 hover:underline dark:text-purple-400 dark:hover:text-purple-300"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {category.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {category.theme || "-"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {category.score ? (
-                      <span className="font-semibold">{category.score}</span>
-                    ) : (
-                      "-"
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {category.score ? (
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                        プレイ済み
-                      </span>
-                    ) : (
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                        未プレイ
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                  {category.name}
+                </a>
+              </td>
+              <td className="px-4 py-3 border-b border-gray-300 dark:border-gray-600">
+                {category.theme || "-"}
+              </td>
+              <td className="px-4 py-3 border-b border-gray-300 text-right dark:border-gray-600">
+                {category.score ? (
+                  <span className="font-semibold">{category.score}</span>
+                ) : (
+                  "-"
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

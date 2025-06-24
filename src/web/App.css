@@ -1,4 +1,4 @@
-#root {
+/* #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
@@ -135,45 +135,45 @@
     background-color: #333;
     color: #fff;
   }
-  
+
   .ranking-table th {
     background-color: #444;
     color: #fff;
   }
-  
+
   .ranking-table td,
   .ranking-table th {
     border-bottom-color: #555;
   }
-  
+
   .ranking-table tr:nth-child(even) {
     background-color: #2a2a2a;
   }
-  
+
   .ranking-table tr:hover {
     background-color: #363636;
   }
-  
+
   .pagination button {
     background-color: #333;
     color: #fff;
     border-color: #555;
   }
-  
+
   .pagination button:hover:not(:disabled) {
     background-color: #444;
   }
-  
+
   .pagination button:disabled {
     background-color: #222;
     color: #666;
   }
-  
+
   .footer {
     border-top-color: #555;
     color: #ccc;
   }
-  
+
   .error {
     background-color: #2d1b1b;
     color: #ff6b6b;
@@ -187,4 +187,4 @@
   .user-link:hover {
     color: #a4a9ff;
   }
-}
+*/
