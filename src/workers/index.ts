@@ -54,6 +54,15 @@ const scoreUpdatesQuery = z.object({
     .default("20"),
 });
 
+interface ScoreUpdate {
+  username: string;
+  category: string;
+  previous_score: number | null;
+  new_score: number;
+  update_type: "new_record" | "score_update";
+  created_at: string;
+}
+
 const apiApp = new Hono<{ Bindings: Env }>()
   .get("/ranking", zValidator("query", rankingQuery), async (c) => {
     const { page, search } = c.req.valid("query");
@@ -139,13 +148,13 @@ const apiApp = new Hono<{ Bindings: Env }>()
     try {
       const stmt = c.env.DB.prepare(
         `SELECT username, category, previous_score, new_score, update_type, created_at
-         FROM score_update_history
-         ORDER BY created_at DESC
-         LIMIT ?`
+        FROM score_update_history
+        ORDER BY created_at DESC
+        LIMIT ?`
       ).bind(limit);
 
-      const results = await stmt.all();
-      
+      const results = await stmt.all<ScoreUpdate>();
+
       return c.json({
         updates: results.results || [],
         count: results.results?.length || 0,

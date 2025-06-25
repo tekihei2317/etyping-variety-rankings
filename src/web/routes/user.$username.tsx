@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { apiClient } from "../libs/api-client";
+import { getCategoryUrl } from "../utils/categories";
 
 interface UserCategory {
   id: string;
@@ -17,24 +18,6 @@ interface UserDetails {
   categories: UserCategory[];
 }
 
-function getCategoryUrl(categoryId: string): string {
-  const categoryUrls: Record<string, string> = {
-    business: "https://www.e-typing.ne.jp/roma/variety/business.asp",
-    study: "https://www.e-typing.ne.jp/roma/variety/study.asp",
-    life: "https://www.e-typing.ne.jp/roma/variety/life.asp",
-    travel: "https://www.e-typing.ne.jp/roma/variety/travel.asp",
-    sports: "https://www.e-typing.ne.jp/roma/variety/sports.asp",
-    what: "https://www.e-typing.ne.jp/roma/variety/what.asp",
-    brain: "https://www.e-typing.ne.jp/roma/variety/brain.asp",
-    dialect: "https://www.e-typing.ne.jp/roma/variety/dialect.asp",
-    long: "https://www.e-typing.ne.jp/roma/variety/long.asp",
-    tenkey: "https://www.e-typing.ne.jp/roma/variety/tenkey.asp",
-    hyakunin: "https://www.e-typing.ne.jp/roma/variety/hyakunin.asp",
-    siritori: "https://www.e-typing.ne.jp/roma/variety/siritori.asp",
-    medical: "https://www.e-typing.ne.jp/roma/variety/medical.asp",
-  };
-  return categoryUrls[categoryId] || "https://www.e-typing.ne.jp/";
-}
 
 export const Route = createFileRoute("/user/$username")({
   component: RouteComponent,

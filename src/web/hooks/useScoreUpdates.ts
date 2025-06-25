@@ -1,22 +1,9 @@
 import { useState, useEffect } from "react";
 import { hc } from "hono/client";
 import type { AppType } from "../../workers/index";
+import type { ScoreUpdate } from "../types/score-updates";
 
 const client = hc<AppType>("/");
-
-interface ScoreUpdate {
-  username: string;
-  category: string;
-  previous_score: number | null;
-  new_score: number;
-  update_type: "new_record" | "score_update";
-  created_at: string;
-}
-
-interface ScoreUpdatesResponse {
-  updates: ScoreUpdate[];
-  count: number;
-}
 
 export function useScoreUpdates(limit: number = 20) {
   const [updates, setUpdates] = useState<ScoreUpdate[]>([]);
@@ -33,7 +20,7 @@ export function useScoreUpdates(limit: number = 20) {
       });
 
       if (response.ok) {
-        const data: ScoreUpdatesResponse = await response.json();
+        const data = await response.json();
         setUpdates(data.updates);
       } else {
         setError("更新履歴の取得に失敗しました");
