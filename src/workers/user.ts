@@ -64,15 +64,16 @@ export async function getUserDetails(
   db: D1Database,
   username: string
 ): Promise<UserDetails> {
-  // データベースから特定ユーザーの全種目スコアを取得
+  // データベースから特定ユーザーの各カテゴリの最高スコアを取得
   const stmt = db.prepare(`
     SELECT
       category,
-      score,
+      MAX(score) as score,
       theme,
       fetched_at
     FROM ranking_scores
     WHERE etyping_name = ?
+    GROUP BY category
     ORDER BY category
   `);
 

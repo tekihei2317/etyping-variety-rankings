@@ -64,10 +64,9 @@ function App() {
         </div>
       </div>
 
-      <div className="my-5 px-2.5 py-2.5 bg-gray-100 rounded text-sm dark:bg-gray-800 dark:text-white">
-        <p>
-          全 {totalCount} 名のユーザー | ページ {currentPage} / {totalPages}
-        </p>
+      {/* スコア更新履歴 */}
+      <div className="mb-6">
+        <ScoreUpdates />
       </div>
 
       {/* ユーザー名検索 */}
@@ -107,9 +106,10 @@ function App() {
         )}
       </div>
 
-      {/* スコア更新履歴 */}
-      <div className="mb-6">
-        <ScoreUpdates />
+      <div className="my-5 px-2.5 py-2.5 bg-gray-100 rounded text-sm dark:bg-gray-800 dark:text-white">
+        <p>
+          全 {totalCount} 名のユーザー | ページ {currentPage} / {totalPages}
+        </p>
       </div>
 
       <table className="w-full border-collapse my-5 text-sm">
