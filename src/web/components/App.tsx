@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useRankingData } from "../hooks/useRankingData";
 import { useRankingNavigation } from "../hooks/useRankingNavigation";
+import { ScoreUpdates } from "./ScoreUpdates";
 import { useState } from "react";
 
 function App() {
@@ -104,6 +105,11 @@ function App() {
             "{currentSearch}" の検索結果: {totalCount}件
           </div>
         )}
+      </div>
+
+      {/* スコア更新履歴 */}
+      <div className="mb-6">
+        <ScoreUpdates />
       </div>
 
       <table className="w-full border-collapse my-5 text-sm">

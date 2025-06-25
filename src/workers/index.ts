@@ -45,6 +45,15 @@ const scoreRegistrationSchema = z.object({
   score: z.number().min(1, "Score must be a positive number"),
 });
 
+const scoreUpdatesQuery = z.object({
+  limit: z
+    .string()
+    .transform((val) => parseInt(val))
+    .pipe(z.number().min(1).max(50))
+    .optional()
+    .default("20"),
+});
+
 const apiApp = new Hono<{ Bindings: Env }>()
   .get("/ranking", zValidator("query", rankingQuery), async (c) => {
     const { page, search } = c.req.valid("query");
@@ -123,6 +132,28 @@ const apiApp = new Hono<{ Bindings: Env }>()
   })
   .get("/register", async (c) => {
     return c.json({ message: "register" });
+  })
+  .get("/score-updates", zValidator("query", scoreUpdatesQuery), async (c) => {
+    const { limit } = c.req.valid("query");
+
+    try {
+      const stmt = c.env.DB.prepare(
+        `SELECT username, category, previous_score, new_score, update_type, created_at
+         FROM score_update_history
+         ORDER BY created_at DESC
+         LIMIT ?`
+      ).bind(limit);
+
+      const results = await stmt.all();
+      
+      return c.json({
+        updates: results.results || [],
+        count: results.results?.length || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching score updates:", error);
+      return c.json({ error: "Failed to fetch score updates" }, 500);
+    }
   })
   .post(
     "/register-score",
