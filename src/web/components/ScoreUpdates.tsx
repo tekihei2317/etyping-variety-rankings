@@ -2,6 +2,7 @@ import { useScoreUpdates } from "../hooks/useScoreUpdates";
 import { Link } from "@tanstack/react-router";
 import { getCategoryIdFromJapaneseName, getCategoryUrl } from "../utils/categories";
 import type { ScoreUpdate } from "../types/score-updates";
+import { ExternalLink } from "./ExternalLink";
 
 function ScoreUpdateItem({ update }: { update: ScoreUpdate }) {
   const formatDate = (dateString: string) => {
@@ -30,14 +31,12 @@ function ScoreUpdateItem({ update }: { update: ScoreUpdate }) {
     const categoryUrl = categoryId ? getCategoryUrl(categoryId) : null;
 
     const categoryElement = categoryUrl ? (
-      <a
+      <ExternalLink
         href={categoryUrl}
-        target="_blank"
-        rel="noopener noreferrer"
         className="font-medium text-purple-600 dark:text-purple-400 hover:text-purple-800 hover:underline dark:hover:text-purple-300 transition-colors duration-200"
       >
         {update.category}
-      </a>
+      </ExternalLink>
     ) : (
       <span className="font-medium text-gray-700 dark:text-white">
         {update.category}

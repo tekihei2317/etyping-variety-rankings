@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { apiClient } from "../libs/api-client";
 import { getCategoryUrl } from "../utils/categories";
+import { ExternalLink } from "../components/ExternalLink";
 
 interface UserCategory {
   id: string;
@@ -127,14 +128,12 @@ function RouteComponent() {
               className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 dark:${index % 2 === 0 ? "bg-gray-900" : "bg-gray-800"} dark:hover:bg-gray-700`}
             >
               <td className="px-4 py-3 border-b border-gray-300 dark:border-gray-600">
-                <a
+                <ExternalLink
                   href={getCategoryUrl(category.id)}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="text-purple-600 no-underline font-medium transition-colors duration-200 hover:text-purple-800 hover:underline dark:text-purple-400 dark:hover:text-purple-300"
                 >
                   {category.name}
-                </a>
+                </ExternalLink>
               </td>
               <td className="px-4 py-3 border-b border-gray-300 dark:border-gray-600">
                 {category.theme || "-"}
