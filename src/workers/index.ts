@@ -32,6 +32,7 @@ const rankingQuery = z.object({
     .pipe(z.number().min(1))
     .optional()
     .default("1"),
+  search: z.string().optional(),
 });
 
 const scoreRegistrationSchema = z.object({
@@ -46,17 +47,27 @@ const scoreRegistrationSchema = z.object({
 
 const apiApp = new Hono<{ Bindings: Env }>()
   .get("/ranking", zValidator("query", rankingQuery), async (c) => {
-    const { page } = c.req.valid("query");
+    const { page, search } = c.req.valid("query");
     const pageSize = 50;
 
     try {
       const totalRanking = await calculateTotalScoreRankingFromDB(c.env.DB);
-      const totalCount = totalRanking.length;
+
+      // ユーザー名検索フィルタリング
+      let filteredRanking = totalRanking;
+      if (search) {
+        const searchLower = search.toLowerCase();
+        filteredRanking = totalRanking.filter((entry) =>
+          entry.username.toLowerCase().includes(searchLower)
+        );
+      }
+
+      const totalCount = filteredRanking.length;
       const totalPages = Math.ceil(totalCount / pageSize);
 
       const startIndex = (page - 1) * pageSize;
       const endIndex = startIndex + pageSize;
-      const pageData = totalRanking.slice(startIndex, endIndex);
+      const pageData = filteredRanking.slice(startIndex, endIndex);
 
       return c.json({
         totalRanking: pageData,
@@ -66,6 +77,7 @@ const apiApp = new Hono<{ Bindings: Env }>()
           totalCount,
           pageSize,
         },
+        search: search || null,
       });
     } catch (error) {
       console.error("Error fetching ranking data:", error);
