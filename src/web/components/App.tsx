@@ -1,117 +1,33 @@
-import { useState, useEffect } from "react";
-import { hc } from "hono/client";
 import { Link } from "@tanstack/react-router";
-import type { AppType } from "../../workers/index";
-
-const client = hc<AppType>("/");
-
-interface TotalRankingEntry {
-  rank: number;
-  username: string;
-  totalScore: number;
-  categoryScores: Record<string, number>;
-  categoriesPlayed: number;
-}
-
-interface RankingResponse {
-  totalRanking: TotalRankingEntry[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalCount: number;
-    pageSize: number;
-  };
-  search: string | null;
-}
+import { useRankingData } from "../hooks/useRankingData";
+import { useRankingNavigation } from "../hooks/useRankingNavigation";
 
 function App() {
-  const [ranking, setRanking] = useState<TotalRankingEntry[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentSearch, setCurrentSearch] = useState<string | null>(null);
-  const [pageInput, setPageInput] = useState("");
+  const {
+    ranking,
+    currentPage,
+    totalPages,
+    totalCount,
+    loading,
+    error,
+    currentSearch,
+    fetchRanking,
+  } = useRankingData();
 
-  // ランキングデータを取得
-  const fetchRanking = async (page: number, search?: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const queryParams: { page: string; search?: string } = {
-        page: page.toString(),
-      };
-
-      if (search) {
-        queryParams.search = search;
-      }
-
-      const response = await client.api.ranking.$get({
-        query: queryParams,
-      });
-
-      if (response.ok) {
-        const data: RankingResponse = await response.json();
-        setRanking(data.totalRanking);
-        setCurrentPage(data.pagination.currentPage);
-        setTotalPages(data.pagination.totalPages);
-        setTotalCount(data.pagination.totalCount);
-        setCurrentSearch(data.search);
-      } else {
-        setError("ランキングデータの取得に失敗しました");
-      }
-    } catch (err) {
-      setError("ネットワークエラーが発生しました");
-      console.error("Error fetching ranking:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 初回読み込み
-  useEffect(() => {
-    fetchRanking(1);
-  }, []);
-
-  // ページ変更
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      fetchRanking(page, currentSearch || undefined);
-    }
-  };
-
-  // 検索ハンドラー
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmedQuery = searchQuery.trim();
-    if (trimmedQuery) {
-      fetchRanking(1, trimmedQuery);
-    } else {
-      // 空の検索 = 検索クリア
-      setCurrentSearch(null);
-      fetchRanking(1);
-    }
-  };
-
-  // 検索クリアハンドラー
-  const handleClearSearch = () => {
-    setSearchQuery("");
-    setCurrentSearch(null);
-    fetchRanking(1);
-  };
-
-  // ページジャンプハンドラー
-  const handlePageJump = (e: React.FormEvent) => {
-    e.preventDefault();
-    const pageNumber = parseInt(pageInput);
-    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalPages) {
-      handlePageChange(pageNumber);
-      setPageInput(""); // 成功時のみクリア
-    }
-  };
+  const {
+    searchQuery,
+    setSearchQuery,
+    pageInput,
+    setPageInput,
+    handlePageChange,
+    handleSearch,
+    handleClearSearch,
+    handlePageJump,
+  } = useRankingNavigation({
+    totalPages,
+    currentSearch,
+    fetchRanking,
+  });
 
   if (loading) {
     return <p>読み込み中...</p>;
@@ -267,7 +183,9 @@ function App() {
             max={totalPages}
             className="w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
           />
-          <span className="text-sm text-gray-600 dark:text-gray-400">/ {totalPages}</span>
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            / {totalPages}
+          </span>
           <button
             type="submit"
             className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors duration-200"
