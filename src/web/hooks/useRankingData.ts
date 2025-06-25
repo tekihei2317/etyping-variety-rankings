@@ -15,22 +15,26 @@ interface TotalRankingEntry {
 interface RankingResponse {
   totalRanking: TotalRankingEntry[];
   pagination: {
-    currentPage: number;
     totalPages: number;
     totalCount: number;
     pageSize: number;
   };
-  search: string | null;
 }
 
-export function useRankingData() {
+type UseRankingDataInput = {
+  currentPage: number;
+  currentSearch: string;
+};
+
+export function useRankingData({
+  currentPage,
+  currentSearch,
+}: UseRankingDataInput) {
   const [ranking, setRanking] = useState<TotalRankingEntry[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentSearch, setCurrentSearch] = useState<string | null>(null);
 
   const fetchRanking = async (page: number, search?: string) => {
     try {
@@ -41,7 +45,7 @@ export function useRankingData() {
         page: page.toString(),
       };
 
-      if (search) {
+      if (search && search.trim()) {
         queryParams.search = search;
       }
 
@@ -52,10 +56,8 @@ export function useRankingData() {
       if (response.ok) {
         const data: RankingResponse = await response.json();
         setRanking(data.totalRanking);
-        setCurrentPage(data.pagination.currentPage);
         setTotalPages(data.pagination.totalPages);
         setTotalCount(data.pagination.totalCount);
-        setCurrentSearch(data.search);
       } else {
         setError("ランキングデータの取得に失敗しました");
       }
@@ -67,10 +69,9 @@ export function useRankingData() {
     }
   };
 
-  // 初回読み込み
   useEffect(() => {
-    fetchRanking(1);
-  }, []);
+    fetchRanking(currentPage, currentSearch || undefined);
+  }, [currentPage, currentSearch]);
 
   return {
     ranking,

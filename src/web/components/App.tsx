@@ -1,18 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { useRankingData } from "../hooks/useRankingData";
 import { useRankingNavigation } from "../hooks/useRankingNavigation";
+import { useState } from "react";
 
 function App() {
-  const {
-    ranking,
-    currentPage,
-    totalPages,
-    totalCount,
-    loading,
-    error,
-    currentSearch,
-    fetchRanking,
-  } = useRankingData();
+  const [currentSearch, setCurrentSearch] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { ranking, totalPages, totalCount, loading, error, fetchRanking } =
+    useRankingData({ currentPage, currentSearch });
 
   const {
     searchQuery,
@@ -23,11 +19,7 @@ function App() {
     handleSearch,
     handleClearSearch,
     handlePageJump,
-  } = useRankingNavigation({
-    totalPages,
-    currentSearch,
-    fetchRanking,
-  });
+  } = useRankingNavigation({ totalPages, setCurrentSearch, setCurrentPage });
 
   if (loading) {
     return <p>読み込み中...</p>;
@@ -43,7 +35,7 @@ function App() {
           エラー: {error}
         </p>
         <button
-          onClick={() => fetchRanking(currentPage)}
+          onClick={() => fetchRanking(currentPage, currentSearch || undefined)}
           className="mt-4 px-4 py-2 border border-gray-300 bg-white text-gray-700 cursor-pointer rounded transition-colors duration-200 hover:bg-gray-50"
         >
           再読み込み
