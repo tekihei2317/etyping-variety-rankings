@@ -21,6 +21,7 @@ interface RankingResponse {
     totalCount: number;
     pageSize: number;
   };
+  search: string | null;
 }
 
 function App() {
@@ -30,17 +31,26 @@ function App() {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentSearch, setCurrentSearch] = useState<string | null>(null);
+  const [pageInput, setPageInput] = useState("");
 
   // ランキングデータを取得
-  const fetchRanking = async (page: number) => {
+  const fetchRanking = async (page: number, search?: string) => {
     try {
       setLoading(true);
       setError(null);
 
+      const queryParams: { page: string; search?: string } = {
+        page: page.toString(),
+      };
+
+      if (search) {
+        queryParams.search = search;
+      }
+
       const response = await client.api.ranking.$get({
-        query: {
-          page: page.toString(),
-        },
+        query: queryParams,
       });
 
       if (response.ok) {
@@ -49,6 +59,7 @@ function App() {
         setCurrentPage(data.pagination.currentPage);
         setTotalPages(data.pagination.totalPages);
         setTotalCount(data.pagination.totalCount);
+        setCurrentSearch(data.search);
       } else {
         setError("ランキングデータの取得に失敗しました");
       }
@@ -68,7 +79,37 @@ function App() {
   // ページ変更
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      fetchRanking(page);
+      fetchRanking(page, currentSearch || undefined);
+    }
+  };
+
+  // 検索ハンドラー
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedQuery = searchQuery.trim();
+    if (trimmedQuery) {
+      fetchRanking(1, trimmedQuery);
+    } else {
+      // 空の検索 = 検索クリア
+      setCurrentSearch(null);
+      fetchRanking(1);
+    }
+  };
+
+  // 検索クリアハンドラー
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    setCurrentSearch(null);
+    fetchRanking(1);
+  };
+
+  // ページジャンプハンドラー
+  const handlePageJump = (e: React.FormEvent) => {
+    e.preventDefault();
+    const pageNumber = parseInt(pageInput);
+    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalPages) {
+      handlePageChange(pageNumber);
+      setPageInput(""); // 成功時のみクリア
     }
   };
 
@@ -120,6 +161,43 @@ function App() {
         </p>
       </div>
 
+      {/* ユーザー名検索 */}
+      <div className="mb-6">
+        <form onSubmit={handleSearch} className="flex gap-3 items-center">
+          <div className="flex-1">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="ユーザー名で検索..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+            />
+          </div>
+          <button
+            type="submit"
+            className="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors duration-200"
+          >
+            検索
+          </button>
+          {currentSearch && (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200"
+            >
+              クリア
+            </button>
+          )}
+        </form>
+
+        {/* 検索結果表示 */}
+        {currentSearch && (
+          <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+            "{currentSearch}" の検索結果: {totalCount}件
+          </div>
+        )}
+      </div>
+
       <table className="w-full border-collapse my-5 text-sm">
         <thead>
           <tr>
@@ -169,7 +247,7 @@ function App() {
       </table>
 
       {/* ページネーション */}
-      <div className="flex justify-center items-center gap-5 my-8">
+      <div className="flex justify-center items-center gap-6 my-8">
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage <= 1}
@@ -178,9 +256,25 @@ function App() {
           前のページ
         </button>
 
-        <span className="font-medium min-w-20 text-center">
-          {currentPage} / {totalPages}
-        </span>
+        {/* ページ番号直接入力フォーム */}
+        <form onSubmit={handlePageJump} className="flex items-center gap-2">
+          <input
+            type="number"
+            value={pageInput}
+            onChange={(e) => setPageInput(e.target.value)}
+            placeholder={currentPage.toString()}
+            min="1"
+            max={totalPages}
+            className="w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+          />
+          <span className="text-sm text-gray-600 dark:text-gray-400">/ {totalPages}</span>
+          <button
+            type="submit"
+            className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors duration-200"
+          >
+            移動
+          </button>
+        </form>
 
         <button
           onClick={() => handlePageChange(currentPage + 1)}
