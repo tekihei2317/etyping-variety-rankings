@@ -81,13 +81,14 @@ export function calculateTotalScoreRanking(
 export async function calculateTotalScoreRankingFromDB(
   db: D1Database
 ): Promise<TotalRankingEntryWithRank[]> {
-  // データベースから全ランキングデータを取得
+  // データベースから各ユーザー・カテゴリごとの最高スコアを取得
   const stmt = db.prepare(`
-    SELECT 
+    SELECT
       etyping_name,
       category,
-      score
+      MAX(score) as score
     FROM ranking_scores
+    GROUP BY etyping_name, category
     ORDER BY etyping_name, category
   `);
 
@@ -119,7 +120,7 @@ export async function calculateTotalScoreRankingFromDB(
     医療介護: "medical",
   };
 
-  // ユーザーごとにスコアを集計
+  // ユーザーごとにスコアを集計（各カテゴリの最高スコアのみ）
   result.results.forEach((record) => {
     const categoryId = categoryIdMap[record.category] || record.category;
     const existing = userScores.get(record.etyping_name);

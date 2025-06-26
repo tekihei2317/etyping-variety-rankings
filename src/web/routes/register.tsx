@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { apiClient } from "../libs/api-client";
 
@@ -24,11 +24,13 @@ export const Route = createFileRoute("/register")({
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [username, setUsername] = useState("");
   const [score, setScore] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,11 +61,16 @@ function RouteComponent() {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        setMessage(`✅ ${result.message}`);
-        // フォームをリセット
-        setSelectedCategory("");
-        setUsername("");
-        setScore("");
+        setMessage(`✅ ${result.message} ユーザーページに移動します...`);
+        setIsRedirecting(true);
+
+        // 2秒後にユーザーページに遷移
+        setTimeout(() => {
+          navigate({
+            to: "/user/$username",
+            params: { username: encodeURIComponent(username) },
+          });
+        }, 2000);
       } else {
         // 400エラーなどのAPIエラーの場合
         setMessage(`❌ ${result.message || "登録に失敗しました"}`);
@@ -81,10 +88,8 @@ function RouteComponent() {
 
   return (
     <div className="max-w-4xl mx-auto px-5 text-left">
-      <h2 className="text-2xl font-bold mb-2">スコア登録</h2>
-
       <div className="mt-2 mb-6 px-4 py-4 bg-blue-50 rounded border border-blue-200 dark:bg-blue-900 dark:border-blue-700">
-        <h3 className="text-lg font-semibold mb-2">スコア登録について</h3>
+        <h2 className="text-lg font-semibold mb-2">スコア登録について</h2>
         <ul className="text-sm space-y-1">
           <li>• e-typingのランキングに登録されているスコアのみ登録できます</li>
           <li>• ユーザー名とスコアが完全に一致する必要があります</li>
@@ -161,13 +166,18 @@ function RouteComponent() {
         <div>
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || isRedirecting}
             className="w-full px-6 py-3 bg-purple-600 text-white font-medium rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
           >
             {isLoading ? (
               <div className="flex items-center justify-center space-x-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 <span>e-typingで確認中...</span>
+              </div>
+            ) : isRedirecting ? (
+              <div className="flex items-center justify-center space-x-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>ユーザーページに移動中...</span>
               </div>
             ) : (
               "スコアを登録"

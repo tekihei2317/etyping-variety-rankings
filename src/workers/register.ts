@@ -43,6 +43,28 @@ function getCategoryJapaneseName(categoryId: string): string {
 }
 
 /**
+ * カテゴリIDから対応するお題を取得
+ */
+function getCategoryTheme(categoryId: string): string {
+  const categoryThemeMap: Record<string, string> = {
+    business: "プレゼンの基本",
+    study: "元素名",
+    life: "天気のことば",
+    travel: "世界遺産",
+    sports: "歴代名力士",
+    what: "缶コーヒーのコピー",
+    brain: "なんけた1",
+    dialect: "北海道",
+    long: "世界の童話2",
+    tenkey: "漢数字",
+    hyakunin: "歌人名",
+    siritori: "植物",
+    medical: "医療介護関係の仕事",
+  };
+  return categoryThemeMap[categoryId] || "不明";
+}
+
+/**
  * スコア登録処理のメイン関数
  */
 export interface RegisterScoreInput {
@@ -92,15 +114,49 @@ export async function registerUserScore({
     };
   }
 
-  // データベースにデータを登録する
+  // データベースにデータを登録する（トランザクション）
   const categoryJapaneseName = getCategoryJapaneseName(categoryId);
-  const stmt = db
-    .prepare(
-      `INSERT INTO ranking_scores (etyping_name, category, score, created_at, updated_at)
-        VALUES (?, ?, ?, datetime('now'), datetime('now'))`
-    )
-    .bind(userData.userName, categoryJapaneseName, userData.score);
-  await stmt.run();
+  const categoryTheme = getCategoryTheme(categoryId);
+  const currentDateTime = new Date().toISOString();
+  const updateType = existingScore === null ? "new_record" : "score_update";
+
+  try {
+    await db.batch([
+      // ランキングスコア登録
+      db
+        .prepare(
+          `INSERT INTO ranking_scores (fetched_at, category, theme, etyping_name, score)
+          VALUES (?, ?, ?, ?, ?)`
+        )
+        .bind(
+          currentDateTime,
+          categoryJapaneseName,
+          categoryTheme,
+          userData.userName,
+          userData.score
+        ),
+      // スコア更新履歴記録
+      db
+        .prepare(
+          `INSERT INTO score_update_history (username, category, previous_score, new_score, update_type, created_at)
+          VALUES (?, ?, ?, ?, ?, datetime('now'))`
+        )
+        .bind(
+          userData.userName,
+          categoryJapaneseName,
+          existingScore,
+          userData.score,
+          updateType
+        ),
+    ]);
+  } catch (error) {
+    console.error("Database transaction failed:", error);
+    return {
+      success: false,
+      message: "データベースへの登録に失敗しました",
+      statusCode: 500,
+    };
+  }
 
   return {
     success: true,

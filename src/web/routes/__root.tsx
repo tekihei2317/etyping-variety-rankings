@@ -15,7 +15,7 @@ function RootComponent() {
               e-typingバラエティ 総合ランキング
             </h1>
           </Link>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
             バラエティ全13種目の合計スコアランキング
           </p>
         </div>
