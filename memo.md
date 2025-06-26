@@ -9,6 +9,8 @@
 - HonoのRPCのドキュメント見てるけど、複数のエンドポイントある場合の書き方が分からない
 - Cloudflare D1の基本的な使い方を調べる。マイグレーションを本番DBに反映する方法とか覚えてない。
 - Tanstack Routerで`src/routes`じゃなくて`src/web/routes`にしたい場合は？
+- Cloudflare Workersにデプロイしているけれど、Cloudflare Pagesとの違いを知りたい
+- Cloudflare Workers Buildsで自動デプロイしたい
 
 ### Cloudflareのpuppeteerのドキュメントがあったので読もう
 
@@ -166,6 +168,60 @@ Error in registerUserScore: ProtocolError: Protocol error (Target.createTarget):
 Browser render workerのパフォーマンスを上げる一番の方法はセッションを再利用すること。端的に言えば、`browser.close()`の代わりに`browser.disconnect()`を使い、再接続する場合は`puppeteer.connect(browser, sessionId)`を使う。
 
 この実装を参考に、今の実装を修正してみよう。
+
+### Cloudflare Workersにデプロイしているけど、Cloudflare Pagesとの違いを知りたい
+
+結論: Cloudflareは、Cloudflare Workersでフルスタックアプリケーションが作れるように、Cloudflare Pagesの初機能をCloudflare Workersに取り組んできた。そのおかげで今はCloudflare Workersでほとんどのことができるようになっているので、アプリはCloudflare Workersで構築することが推奨されている。PagesからWorkersへの移行ガイドも出されている。
+
+参考: [フロントエンド、バックエンド、データベースが1つのCloudflare Workerに](https://blog.cloudflare.com/ja-jp/full-stack-development-on-cloudflare-workers/)
+
+---
+
+[Cloudflare Workers と Pages の違いを徹底比較（2025 年版）](https://zenn.dev/kg_lens/articles/c4d292166a8c4c)
+
+まとめには、静的サイトならPages、APIとかならWorkers、両方あるならPages + Functionsと書かれている。
+
+わかりやすい違いはビルドパイプラインっぽい？Cloudflare PagesはGitHubへのプッシュで自動デプロイしてくれるけれど、Workersにはそれがない感じなのかな。
+
+ドキュメントを読んでいると"We recommend using Cloudflare Workers for new projects. For existing Pages projects, see our migration guide and compatibility matrix."と書かれてあって、Cloudflare Pagesへの移行が推奨されているみたい。これはどういう経緯があったんだろうか。
+
+Workersでも、プレビュー環境を作ったり、mainブランチの変更で自動デプロイできるようにしたい。その設定がどうやったらできるんだろう。移行ガイドもとりあえず読んでみたい。
+
+---
+
+[Cloudflare PagesからWorkersへの移行](https://qlitre-dialy.ink/post/migration-to-cloudflare-workers)
+
+HonoXっていうライブラリがあるんだ。
+
+---
+
+[フロントエンド、バックエンド、データベースが1つのCloudflare Workerに](https://blog.cloudflare.com/ja-jp/full-stack-development-on-cloudflare-workers/)
+
+ここ結構気になってた情報が集まっていて良さげ。
+
+Workersに移行する経緯としては、もともとアセットの配信はPagesでしかサポートされなくなって、2024年9月にWorkrersでのアセット配信がβサポートされた。そのおかげで単一のWorkerでフルスタックアプリケーションが作れるようになった。
+
+今のプロジェクトは`npm create cloudflare@latest -- --template=cloudflare/templates/vite-react-template`の設定ファイルをコピーして持ってきている。ここでは`npm create cloudflare@latest my-react-app -- --framework=react`が説明されている。これは`api/`っていうディレクトリも用意されてるから、Workersのセットアップもされていそう。
+
+シングルページアプリケーションについても書かれている。シングルページアプリケーションモードを有効化すると、ブラウザからのアクセスは全部静的アセットに流され、見つからなかった場合に`index.html`が返されるようになる。それ以外のリクエストはWorkersに流される。
+
+> このセットアップによって、Reactでフロントエンドをレンダリングし、Workerでバックエンドの操作を処理し、Viteでこの2つをつなぎ合わせることができます。
+
+[korinne/react-postgres-fullstack-template](https://github.com/korinne/react-postgres-fullstack-template)
+
+`sql`タグをhonoのコンテキストに入れてるのいいな...真似したい。D1でsqlタグ使えるやつってあるのかな。smart placementの説明も書かれている。データベースが他の場所にある場合は、ワーカーをそのデータベースの近くに移動させるらしい。これって本当に速くなるのかな？
+
+Workers Buildsっていうのがあるらしい。これがビルドを自動化するために使うやつだ。GitリポジトリをWorkerに接続して、変更があったときにデプロイできるようになる。これあとでやってみよう。
+
+### Cloudflare Workers Buildsで自動デプロイしたい
+
+Cloudflare Workers Buildsは現在ベータ版。
+
+[Builds · Cloudflare Workers docs](https://developers.cloudflare.com/workers/ci-cd/builds/)
+
+リポジトリを選択して新しいWorkerをデプロイするか、既存のワーカーにWorkers Buildsの設定をするかのどちらか。Workerの名前を変更したかったので前者でやってみようと思う。
+
+ドキュメントを見ている感じ特に難しい概念がある訳ではなさそうだ。ダッシュボードをポチポチしてこよう。
 
 ### その他
 

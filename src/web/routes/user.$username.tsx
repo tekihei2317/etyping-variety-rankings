@@ -87,7 +87,7 @@ function RouteComponent() {
         <h1 className="text-2xl font-bold mb-4">
           {userDetails.username} のスコア詳細
         </h1>
-        <div className="my-5 px-2.5 py-2.5 bg-gray-100 rounded text-sm flex justify-around text-center dark:bg-gray-800 dark:text-white">
+        <div className="my-5 px-2.5 py-2.5 bg-gray-100 rounded text-sm flex justify-around text-center">
           <div>
             <div className="text-xl font-bold">{userDetails.totalScore}</div>
             <div>総合スコア</div>
@@ -110,13 +110,13 @@ function RouteComponent() {
       <table className="w-full border-collapse my-5 text-sm">
         <thead>
           <tr>
-            <th className="px-4 py-3 text-left border-b border-gray-300 bg-gray-100 font-semibold sticky top-0 z-10 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+            <th className="px-4 py-3 text-left border-b border-gray-300 bg-gray-100 font-semibold sticky top-0 z-10">
               種目
             </th>
-            <th className="px-4 py-3 text-left border-b border-gray-300 bg-gray-100 font-semibold sticky top-0 z-10 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+            <th className="px-4 py-3 text-left border-b border-gray-300 bg-gray-100 font-semibold sticky top-0 z-10">
               お題
             </th>
-            <th className="px-4 py-3 text-left border-b border-gray-300 bg-gray-100 font-semibold sticky top-0 z-10 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+            <th className="px-4 py-3 text-left border-b border-gray-300 bg-gray-100 font-semibold sticky top-0 z-10">
               スコア
             </th>
           </tr>
@@ -125,20 +125,20 @@ function RouteComponent() {
           {userDetails.categories.map((category, index) => (
             <tr
               key={category.id}
-              className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 dark:${index % 2 === 0 ? "bg-gray-900" : "bg-gray-800"} dark:hover:bg-gray-700`}
+              className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100`}
             >
-              <td className="px-4 py-3 border-b border-gray-300 dark:border-gray-600">
+              <td className="px-4 py-3 border-b border-gray-300">
                 <ExternalLink
                   href={getCategoryUrl(category.id)}
-                  className="text-purple-600 no-underline font-medium transition-colors duration-200 hover:text-purple-800 hover:underline dark:text-purple-400 dark:hover:text-purple-300"
+                  className="text-primary-600 no-underline font-medium transition-colors duration-200 hover:text-primary-700 hover:underline"
                 >
                   {category.name}
                 </ExternalLink>
               </td>
-              <td className="px-4 py-3 border-b border-gray-300 dark:border-gray-600">
+              <td className="px-4 py-3 border-b border-gray-300">
                 {category.theme || "-"}
               </td>
-              <td className="px-4 py-3 border-b border-gray-300 text-right dark:border-gray-600">
+              <td className="px-4 py-3 border-b border-gray-300 text-right">
                 {category.score ? (
                   <span className="font-semibold">{category.score}</span>
                 ) : (
