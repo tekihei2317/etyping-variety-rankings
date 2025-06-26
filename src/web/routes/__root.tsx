@@ -11,11 +11,11 @@ function RootComponent() {
       <header className="mb-8 text-left">
         <div className="mb-4">
           <Link to="/" className="text-decoration-none">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
+            <h1 className="text-3xl font-bold text-gray-900 hover:text-primary-600 transition-colors duration-200">
               e-typing バラエティ総合ランキング
             </h1>
           </Link>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-sm text-gray-600 mt-2">
             バラエティ全13種目の合計スコアランキング
           </p>
         </div>
@@ -26,14 +26,14 @@ function RootComponent() {
       </main>
 
       {/* 共通フッター */}
-      <footer className="mt-10 pt-5 border-t border-gray-300 text-center text-gray-600 text-sm dark:border-gray-600 dark:text-gray-400">
+      <footer className="mt-10 pt-5 border-t border-gray-300 text-center text-gray-600 text-sm">
         <p>
           データ取得元:{" "}
           <a
             href="https://www.e-typing.ne.jp/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary-600 no-underline hover:underline dark:text-primary-400"
+            className="text-primary-600 no-underline hover:underline"
           >
             e-typing
           </a>

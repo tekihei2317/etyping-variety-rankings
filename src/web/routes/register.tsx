@@ -88,7 +88,7 @@ function RouteComponent() {
 
   return (
     <div className="max-w-4xl mx-auto px-5 text-left">
-      <div className="mt-2 mb-6 px-4 py-4 bg-primary-50 rounded border border-primary-200 dark:bg-primary-900 dark:border-primary-700">
+      <div className="mt-2 mb-6 px-4 py-4 bg-primary-50 rounded border border-primary-200">
         <h2 className="text-lg font-semibold mb-2">スコア登録について</h2>
         <ul className="text-sm space-y-1">
           <li>• e-typingのランキングに登録されているスコアのみ登録できます</li>
@@ -106,7 +106,7 @@ function RouteComponent() {
             id="category"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             required
           >
             <option value="">種目を選択してください</option>
@@ -128,7 +128,7 @@ function RouteComponent() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="e-typingで使用している登録名を入力"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             required
           />
         </div>
@@ -144,7 +144,7 @@ function RouteComponent() {
             onChange={(e) => setScore(e.target.value)}
             placeholder="獲得したスコアを入力"
             min="1"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             required
           />
         </div>
@@ -155,8 +155,8 @@ function RouteComponent() {
               message.includes("❌") ||
               message.includes("エラー") ||
               message.includes("入力してください")
-                ? "bg-red-50 text-red-700 border border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700"
-                : "bg-green-50 text-green-700 border border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700"
+                ? "bg-red-50 text-red-700 border border-red-200"
+                : "bg-green-50 text-green-700 border border-green-200"
             }`}
           >
             {message}
