@@ -12,7 +12,7 @@ function RootComponent() {
         <div className="mb-4">
           <Link to="/" className="text-decoration-none">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
-              e-typingバラエティ 総合ランキング
+              e-typing バラエティ総合ランキング
             </h1>
           </Link>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
