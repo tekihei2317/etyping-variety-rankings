@@ -4,8 +4,8 @@
 
 ## タスク一覧
 
-- [ ] faviconを追加する
-- [ ] テーマカラーを変更する。現在の紫から、以前使っていた淡い紫色（`#3646cf`かな）に変更したい
+- [x] faviconを追加する
+- [x] テーマカラーを変更する。現在の紫から、以前使っていた淡い紫色（`#3646cf`かな）に変更したい
 - [x] URLを変更する。今のURLは`e-typing-ranking-api.tekihei2317.workers.dev`なので。そもそもデプロイするのってCloudflare PagesじゃなくてWorkersで良かったのかな。
   - 新しい名前でプロジェクトを作って、ついでにCloudflare Workers Buildsを使って自動デプロイできるようにしておきました。
 
