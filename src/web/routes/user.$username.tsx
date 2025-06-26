@@ -130,7 +130,7 @@ function RouteComponent() {
               <td className="px-4 py-3 border-b border-gray-300 dark:border-gray-600">
                 <ExternalLink
                   href={getCategoryUrl(category.id)}
-                  className="text-purple-600 no-underline font-medium transition-colors duration-200 hover:text-purple-800 hover:underline dark:text-purple-400 dark:hover:text-purple-300"
+                  className="text-primary-600 no-underline font-medium transition-colors duration-200 hover:text-primary-700 hover:underline dark:text-primary-400 dark:hover:text-primary-300"
                 >
                   {category.name}
                 </ExternalLink>

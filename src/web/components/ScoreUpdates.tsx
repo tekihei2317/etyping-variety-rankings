@@ -36,7 +36,7 @@ function ScoreUpdateItem({ update }: { update: ScoreUpdate }) {
     const categoryElement = categoryUrl ? (
       <ExternalLink
         href={categoryUrl}
-        className="font-medium text-purple-600 dark:text-purple-400 hover:text-purple-800 hover:underline dark:hover:text-purple-300 transition-colors duration-200"
+        className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 hover:underline dark:hover:text-primary-300 transition-colors duration-200"
       >
         {update.category}
       </ExternalLink>
@@ -52,7 +52,7 @@ function ScoreUpdateItem({ update }: { update: ScoreUpdate }) {
           <Link
             to="/user/$username"
             params={{ username: update.username }}
-            className="font-medium text-purple-600 dark:text-purple-400 hover:text-purple-800 hover:underline dark:hover:text-purple-300 transition-colors duration-200"
+            className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 hover:underline dark:hover:text-primary-300 transition-colors duration-200"
           >
             {update.username}
           </Link>
@@ -68,7 +68,7 @@ function ScoreUpdateItem({ update }: { update: ScoreUpdate }) {
           <Link
             to="/user/$username"
             params={{ username: update.username }}
-            className="font-medium text-purple-600 dark:text-purple-400 hover:text-purple-800 hover:underline dark:hover:text-purple-300 transition-colors duration-200"
+            className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 hover:underline dark:hover:text-primary-300 transition-colors duration-200"
           >
             {update.username}
           </Link>
@@ -83,7 +83,7 @@ function ScoreUpdateItem({ update }: { update: ScoreUpdate }) {
 
   return (
     <div className="flex items-center gap-3 py-1 dark:border-gray-700">
-      <div className="flex-shrink-0 w-2 h-2 bg-purple-500 rounded-full"></div>
+      <div className="flex-shrink-0 w-2 h-2 bg-primary-500 rounded-full"></div>
       <div className="flex flex-1 min-w-0">
         <p className="text-sm text-gray-800 dark:text-gray-200">
           {getMessage()}

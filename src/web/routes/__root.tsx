@@ -11,7 +11,7 @@ function RootComponent() {
       <header className="mb-8 text-left">
         <div className="mb-4">
           <Link to="/" className="text-decoration-none">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
               e-typingバラエティ 総合ランキング
             </h1>
           </Link>
@@ -33,7 +33,7 @@ function RootComponent() {
             href="https://www.e-typing.ne.jp/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-purple-600 no-underline hover:underline dark:text-purple-400"
+            className="text-primary-600 no-underline hover:underline dark:text-primary-400"
           >
             e-typing
           </a>
