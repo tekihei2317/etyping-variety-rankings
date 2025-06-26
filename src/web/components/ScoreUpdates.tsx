@@ -1,12 +1,15 @@
 import { useScoreUpdates } from "../hooks/useScoreUpdates";
 import { Link } from "@tanstack/react-router";
-import { getCategoryIdFromJapaneseName, getCategoryUrl } from "../utils/categories";
+import {
+  getCategoryIdFromJapaneseName,
+  getCategoryUrl,
+} from "../utils/categories";
 import type { ScoreUpdate } from "../types/score-updates";
 import { ExternalLink } from "./ExternalLink";
 
 function ScoreUpdateItem({ update }: { update: ScoreUpdate }) {
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString + 'Z'); // ZでUTCとして明示的に解釈
+    const date = new Date(dateString + "Z"); // ZでUTCとして明示的に解釈
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -53,9 +56,7 @@ function ScoreUpdateItem({ update }: { update: ScoreUpdate }) {
           >
             {update.username}
           </Link>
-          さん{" "}
-          {categoryElement}
-          で{" "}
+          さんが {categoryElement}で{" "}
           <span className="font-bold text-gray-900 dark:text-white">
             スコア{update.new_score}を記録しました！
           </span>
@@ -71,9 +72,7 @@ function ScoreUpdateItem({ update }: { update: ScoreUpdate }) {
           >
             {update.username}
           </Link>
-          さん{" "}
-          {categoryElement}
-          で{" "}
+          さんが {categoryElement}で{" "}
           <span className="font-bold text-gray-700 dark:text-white">
             スコアを{update.previous_score}→{update.new_score}に更新しました！
           </span>
