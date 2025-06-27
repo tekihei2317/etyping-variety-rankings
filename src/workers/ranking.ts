@@ -81,7 +81,10 @@ export function calculateTotalScoreRanking(
 export async function calculateTotalScoreRankingFromDB(
   db: D1Database
 ): Promise<TotalRankingEntryWithRank[]> {
+  const startTime = performance.now();
+
   // データベースから各ユーザー・カテゴリごとの最高スコアを取得
+  const dbQueryStart = performance.now();
   const stmt = db.prepare(`
     SELECT
       etyping_name,
@@ -96,6 +99,8 @@ export async function calculateTotalScoreRankingFromDB(
     await stmt.all<
       Pick<RankingScoreRecord, "etyping_name" | "category" | "score">
     >();
+  const dbQueryEnd = performance.now();
+  console.log(`Database query time: ${dbQueryEnd - dbQueryStart}ms`);
 
   if (!result.success) {
     throw new Error("Failed to fetch ranking data from database");
@@ -121,6 +126,7 @@ export async function calculateTotalScoreRankingFromDB(
   };
 
   // ユーザーごとにスコアを集計（各カテゴリの最高スコアのみ）
+  const calculationStart = performance.now();
   result.results.forEach((record) => {
     const categoryId = categoryIdMap[record.category] || record.category;
     const existing = userScores.get(record.etyping_name);
@@ -164,6 +170,16 @@ export async function calculateTotalScoreRankingFromDB(
       rank: currentRank,
     });
   }
+  const calculationEnd = performance.now();
+  console.log(
+    `Ranking calculation time: ${calculationEnd - calculationStart}ms`
+  );
+
+  const totalTime = performance.now() - startTime;
+  console.log(`Total ranking processing time: ${totalTime}ms`);
+  console.log(
+    `Records processed: ${result.results.length}, Users: ${rankedUsers.length}`
+  );
 
   return rankedUsers;
 }
