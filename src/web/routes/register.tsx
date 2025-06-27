@@ -127,7 +127,7 @@ function RouteComponent() {
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="e-typingで使用している登録名を入力"
+            placeholder="ランキングに登録した名前を入力"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             required
           />
@@ -142,7 +142,7 @@ function RouteComponent() {
             id="score"
             value={score}
             onChange={(e) => setScore(e.target.value)}
-            placeholder="獲得したスコアを入力"
+            placeholder="登録したスコアを入力"
             min="1"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             required

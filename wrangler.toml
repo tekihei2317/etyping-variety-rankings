@@ -14,8 +14,5 @@ database_id = "0852d5b4-268d-4c2f-9c78-57a7c0e4feaa"
 directory = "./dist/"
 not_found_handling = "single-page-application"
 
-[env.production]
-name = "etyping-ranking-api"
-
-[env.staging]
-name = "etyping-ranking-api-staging"
+[observability.logs]
+enabled = true
