@@ -1,4 +1,5 @@
 import type { Rankings } from "../data/ranking";
+import { getCachedRanking, setCachedRanking, generateCacheKey } from "./cache";
 
 interface RankingScoreRecord {
   id: number;
@@ -79,9 +80,21 @@ export function calculateTotalScoreRanking(
 }
 
 export async function calculateTotalScoreRankingFromDB(
-  db: D1Database
+  db: D1Database,
+  kv: KVNamespace
 ): Promise<TotalRankingEntryWithRank[]> {
   const startTime = performance.now();
+
+  // レコード数を取得してキャッシュキーを生成
+  const cacheKey = await generateCacheKey(db);
+
+  // キャッシュが利用可能な場合はキャッシュを確認
+  const cachedRanking = await getCachedRanking(kv, cacheKey);
+  if (cachedRanking) {
+    const totalTime = performance.now() - startTime;
+    console.log(`Total ranking processing time (cached): ${totalTime}ms`);
+    return cachedRanking;
+  }
 
   // データベースから各ユーザー・カテゴリごとの最高スコアを取得
   const dbQueryStart = performance.now();
@@ -180,6 +193,9 @@ export async function calculateTotalScoreRankingFromDB(
   console.log(
     `Records processed: ${result.results.length}, Users: ${rankedUsers.length}`
   );
+
+  // ランキングをキャッシュに保存する
+  await setCachedRanking(kv, cacheKey, rankedUsers);
 
   return rankedUsers;
 }

@@ -70,7 +70,10 @@ const apiApp = new Hono<{ Bindings: Env }>()
     const pageSize = 50;
 
     try {
-      const totalRanking = await calculateTotalScoreRankingFromDB(c.env.DB);
+      const totalRanking = await calculateTotalScoreRankingFromDB(
+        c.env.DB,
+        c.env.RANKING_KV
+      );
 
       // ユーザー名検索フィルタリング
       const filterStart = performance.now();
