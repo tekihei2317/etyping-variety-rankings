@@ -35,3 +35,35 @@ GET https://etyping-variety-rankings.tekihei2317.workers.dev/api/ranking?page=1&
   (log) Filtering time: 0ms
   (log) Total API request time: 55ms
 ```
+
+キャッシュがある時でも10秒くらいしか早くなってない。あと、キャッシュするのに3秒くらいかかってかなり遅くなってしまっている。
+
+```
+GET https://etyping-variety-rankings.tekihei2317.workers.dev/api/ranking?page=1 - Ok @ 2025/6/27 23:15:39
+  (log) Cache miss. Cache check took 392ms
+  (log) Database query time: 227ms
+  (log) Ranking calculation time: 0ms
+  (log) Total ranking processing time: 1100ms
+  (log) Records processed: 4574, Users: 2244
+  (log) Cached ranking data in KV (2947ms)
+  (log) Data size: 259267 bytes
+  (log) Filtering time: 0ms
+  (log) Total API request time: 4047ms
+GET https://etyping-variety-rankings.tekihei2317.workers.dev/api/score-updates?limit=15 - Ok @ 2025/6/27 23:15:43
+GET https://etyping-variety-rankings.tekihei2317.workers.dev/api/ranking?page=1 - Ok @ 2025/6/27 23:16:28
+  (log) Cache hit! Retrieved from KV in 5ms
+  (log) Total ranking processing time (cached): 38ms
+  (log) Filtering time: 0ms
+  (log) Total API request time: 38ms
+GET https://etyping-variety-rankings.tekihei2317.workers.dev/api/score-updates?limit=15 - Ok @ 2025/6/27 23:16:29
+GET https://etyping-variety-rankings.tekihei2317.workers.dev/api/ranking?page=1 - Ok @ 2025/6/27 23:16:37
+  (log) Cache miss. Cache check took 402ms
+  (log) Database query time: 52ms
+  (log) Ranking calculation time: 0ms
+  (log) Total ranking processing time: 498ms
+  (log) Records processed: 4574, Users: 2244
+  (log) Cached ranking data in KV (2314ms)
+  (log) Data size: 259267 bytes
+  (log) Filtering time: 0ms
+  (log) Total API request time: 2812ms
+```

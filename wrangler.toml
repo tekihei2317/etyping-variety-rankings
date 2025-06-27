@@ -10,10 +10,6 @@ binding = "DB"
 database_name = "e-typing-variety-rankings"
 database_id = "0852d5b4-268d-4c2f-9c78-57a7c0e4feaa"
 
-[[kv_namespaces]]
-binding = "RANKING_KV"
-id = "286614c31c8147cfbe72f89f99b8bf9f"
-
 [assets]
 directory = "./dist/"
 not_found_handling = "single-page-application"

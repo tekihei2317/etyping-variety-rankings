@@ -65,18 +65,13 @@ interface ScoreUpdate {
 
 const apiApp = new Hono<{ Bindings: Env }>()
   .get("/ranking", zValidator("query", rankingQuery), async (c) => {
-    const requestStart = performance.now();
     const { page, search } = c.req.valid("query");
     const pageSize = 50;
 
     try {
-      const totalRanking = await calculateTotalScoreRankingFromDB(
-        c.env.DB,
-        c.env.RANKING_KV
-      );
+      const totalRanking = await calculateTotalScoreRankingFromDB(c.env.DB);
 
       // ユーザー名検索フィルタリング
-      const filterStart = performance.now();
       let filteredRanking = totalRanking;
       if (search) {
         const searchLower = search.toLowerCase();
@@ -84,8 +79,6 @@ const apiApp = new Hono<{ Bindings: Env }>()
           entry.username.toLowerCase().includes(searchLower)
         );
       }
-      const filterEnd = performance.now();
-      console.log(`Filtering time: ${filterEnd - filterStart}ms`);
 
       const totalCount = filteredRanking.length;
       const totalPages = Math.ceil(totalCount / pageSize);
@@ -93,9 +86,6 @@ const apiApp = new Hono<{ Bindings: Env }>()
       const startIndex = (page - 1) * pageSize;
       const endIndex = startIndex + pageSize;
       const pageData = filteredRanking.slice(startIndex, endIndex);
-
-      const totalRequestTime = performance.now() - requestStart;
-      console.log(`Total API request time: ${totalRequestTime}ms`);
 
       return c.json({
         totalRanking: pageData,
