@@ -28,6 +28,7 @@ function RouteComponent() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [username, setUsername] = useState("");
   const [score, setScore] = useState("");
+  const [pageNumber, setPageNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -35,7 +36,7 @@ function RouteComponent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedCategory || !username || !score) {
+    if (!selectedCategory || !username || !score || !pageNumber) {
       setMessage("すべての項目を入力してください");
       return;
     }
@@ -43,6 +44,12 @@ function RouteComponent() {
     const scoreNum = parseInt(score);
     if (isNaN(scoreNum) || scoreNum <= 0) {
       setMessage("スコアは正の整数を入力してください");
+      return;
+    }
+
+    const pageNum = parseInt(pageNumber);
+    if (isNaN(pageNum) || pageNum <= 0) {
+      setMessage("ページ番号は正の整数を入力してください");
       return;
     }
 
@@ -55,6 +62,7 @@ function RouteComponent() {
           categoryId: selectedCategory,
           username: username,
           score: scoreNum,
+          pageNumber: pageNum,
         },
       });
 
@@ -119,6 +127,25 @@ function RouteComponent() {
         </div>
 
         <div>
+          <label
+            htmlFor="pageNumber"
+            className="block text-sm font-medium mb-2"
+          >
+            ランキングページ番号 <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="number"
+            id="pageNumber"
+            value={pageNumber}
+            onChange={(e) => setPageNumber(e.target.value)}
+            placeholder="何ページ目に登録されているかを入力"
+            min="1"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            required
+          />
+        </div>
+
+        <div>
           <label htmlFor="username" className="block text-sm font-medium mb-2">
             e-typing登録名 <span className="text-red-500">*</span>
           </label>
@@ -127,7 +154,7 @@ function RouteComponent() {
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="ランキングに登録した名前を入力"
+            placeholder="登録した名前を入力"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             required
           />
