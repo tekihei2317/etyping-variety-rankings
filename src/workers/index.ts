@@ -8,6 +8,10 @@ import { getUserDetails, userParamSchema } from "./user";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { registerUserScore } from "./register";
+import {
+  updateCategoryRanking,
+  updateAllCategoryRankings,
+} from "./ranking-updater";
 
 const categories = [
   { id: "business", name: "ビジネス" },
@@ -53,6 +57,16 @@ const scoreUpdatesQuery = z.object({
     .pipe(z.number().min(1).max(50))
     .optional()
     .default("20"),
+});
+
+const rankingUpdateSchema = z.object({
+  categoryId: z
+    .string()
+    .refine((val) => categories.some((cat) => cat.id === val), {
+      message: "Invalid category ID",
+    })
+    .optional(),
+  dryRun: z.boolean().optional().default(false),
 });
 
 interface ScoreUpdate {
@@ -180,6 +194,40 @@ const apiApp = new Hono<{ Bindings: Env }>()
       });
 
       return c.json(result, result.statusCode);
+    }
+  )
+  .post(
+    "/update-rankings",
+    zValidator("json", rankingUpdateSchema),
+    async (c) => {
+      const { categoryId, dryRun } = c.req.valid("json");
+
+      try {
+        if (categoryId) {
+          // 特定のカテゴリのみ更新
+          const result = await updateCategoryRanking({
+            browser: c.env.MYBROWSER,
+            db: c.env.DB,
+            categoryId,
+            dryRun,
+          });
+          return c.json({ success: true, results: [result] });
+        } else {
+          // 全カテゴリ更新
+          const results = await updateAllCategoryRankings({
+            browser: c.env.MYBROWSER,
+            db: c.env.DB,
+            dryRun,
+          });
+          return c.json({ success: true, results });
+        }
+      } catch (error) {
+        console.error("Error updating rankings:", error);
+        return c.json(
+          { success: false, error: "Failed to update rankings" },
+          500
+        );
+      }
     }
   );
 
