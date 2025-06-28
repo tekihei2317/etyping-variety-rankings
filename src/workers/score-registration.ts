@@ -80,3 +80,20 @@ export async function hasEtypingScore({
 
   return false;
 }
+
+/**
+ * 指定したページにスコアが存在するかどうかを判定する
+ */
+export async function hasEtypingScoreInPage({
+  userData,
+  fetchRankingByPage,
+  pageNumber,
+}: {
+  userData: { userName: string; score: number };
+  fetchRankingByPage: FetchRankingByPage;
+  pageNumber: number;
+}): Promise<boolean> {
+  const entries = await fetchRankingByPage(pageNumber);
+
+  return userDataExists(userData, entries);
+}
