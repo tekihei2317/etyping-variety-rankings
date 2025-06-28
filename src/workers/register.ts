@@ -1,4 +1,4 @@
-import { checkIfScoreExistsInEtyping } from "./etyping-fetcher";
+import { checkIfScoreExistsInSpecificPage } from "./etyping-fetcher";
 
 /**
  * データベースで既存のスコアをチェックする
@@ -71,6 +71,7 @@ export interface RegisterScoreInput {
   browser: Fetcher;
   db: D1Database;
   categoryId: string;
+  pageNumber: number;
   userData: { userName: string; score: number };
 }
 
@@ -78,6 +79,7 @@ export async function registerUserScore({
   browser,
   db,
   categoryId,
+  pageNumber,
   userData,
 }: RegisterScoreInput): Promise<{
   success: boolean;
@@ -98,18 +100,24 @@ export async function registerUserScore({
     };
   }
 
-  // e-typingにデータが登録されているか確認する
-  const found = await checkIfScoreExistsInEtyping({
+  const checkResult = await checkIfScoreExistsInSpecificPage({
     browser,
     categoryId,
     userData,
+    pageNumber,
   });
 
-  if (!found) {
+  if (checkResult.type === "page_number_too_large") {
+    return {
+      success: false,
+      message: "ページ番号が大きすぎます",
+      statusCode: 400,
+    };
+  } else if (checkResult.type === "user_data_does_not_exist") {
     return {
       success: false,
       message:
-        "指定されたユーザー名とスコアの組み合わせがe-typingのランキングに見つかりませんでした",
+        "ユーザー名とスコアの組み合わせがe-typingのランキングに見つかりませんでした",
       statusCode: 400,
     };
   }

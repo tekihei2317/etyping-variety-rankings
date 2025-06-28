@@ -41,6 +41,7 @@ const scoreRegistrationSchema = z.object({
     .refine((val) => categories.some((cat) => cat.id === val), {
       message: "Invalid category ID",
     }),
+  pageNumber: z.number().min(1, "Page number must be a positive number"),
   username: z.string().min(1, "Username is required"),
   score: z.number().min(1, "Score must be a positive number"),
 });
@@ -168,12 +169,13 @@ const apiApp = new Hono<{ Bindings: Env }>()
     "/register-score",
     zValidator("json", scoreRegistrationSchema),
     async (c) => {
-      const { categoryId, username, score } = c.req.valid("json");
+      const { categoryId, username, score, pageNumber } = c.req.valid("json");
 
       const result = await registerUserScore({
         browser: c.env.MYBROWSER,
         db: c.env.DB,
         categoryId,
+        pageNumber,
         userData: { userName: username, score },
       });
 

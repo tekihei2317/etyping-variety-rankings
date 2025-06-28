@@ -1,4 +1,5 @@
 import {
+  hasEtypingScoreInPage,
   hasEtypingScore,
   type FetchRankingByPage,
   type RankingEntry,
@@ -56,13 +57,15 @@ function parseRankingData(): RankingEntry[] {
  */
 export function createEtypingFetcher({
   browserPage,
+  categoryId,
 }: {
   browserPage: Page;
   categoryId: string;
 }): FetchRankingByPage {
   return async (page: number): Promise<RankingEntry[]> => {
-    // 指定したページに移動してから、ランキングを返す
-    console.log(`Moving to page ${page}`);
+    console.log(
+      `[EtypingFetcher] Moving to page ${page} for category: ${categoryId}`
+    );
 
     const currentPage = await browserPage.evaluate(
       () => (window as any).ps_page_target
@@ -73,20 +76,24 @@ export function createEtypingFetcher({
         (window as any).ps_page_move(pageNum);
       }, page);
 
-      // ランキングリストが表示されるまで待機
-      console.log("Waiting for page transition...");
+      console.log(
+        `[EtypingFetcher] Waiting for page transition from ${currentPage} to ${page}`
+      );
       await browserPage.waitForFunction(
         () => {
           return document.querySelector("ul.ranking li:not(.head)") !== null;
         },
         { timeout: 3000 }
       );
-      console.log("Page transition completed");
+      console.log(`[EtypingFetcher] Page transition completed: ${page}`);
+    } else {
+      console.log(`[EtypingFetcher] Already on target page: ${page}`);
     }
 
     const rankings = await browserPage.evaluate(parseRankingData);
-    console.log(`Fetched rankings with ${rankings.length} entries.`);
-    console.log("------------------------------");
+    console.log(
+      `[EtypingFetcher] Fetched ${rankings.length} entries from page ${page} (${categoryId})`
+    );
     return rankings;
   };
 }
@@ -103,23 +110,24 @@ export async function checkIfScoreExistsInEtyping({
   categoryId: string;
   userData: { userName: string; score: number };
 }): Promise<boolean> {
+  console.log(
+    `[EtypingChecker] Starting score existence check for ${userData.userName} (${userData.score}) in ${categoryId}`
+  );
+
   const puppeteerBrowser = await getBrowser(browser);
-
-  // ページを作成する
-  console.log("Creating new page...");
   const page = await puppeteerBrowser.newPage();
-  console.log("Page created successfully");
+  console.log(
+    `[EtypingChecker] Browser page created for category: ${categoryId}`
+  );
 
-  // e-typingページに移動
-  console.log("Navigating to e-typing page...");
   const baseUrl = CATEGORY_URLS[categoryId];
+  console.log(`[EtypingChecker] Navigating to e-typing page: ${baseUrl}`);
   await page.goto(baseUrl, {
     waitUntil: "domcontentloaded",
   });
-  console.log("Navigation completed");
+  console.log(`[EtypingChecker] Navigation completed for ${categoryId}`);
 
-  // JavaScriptが実行されるまで待つ
-  console.log("Waiting for JavaScript to load...");
+  console.log(`[EtypingChecker] Waiting for JavaScript functions to load...`);
   await page.waitForFunction(
     () => {
       return (
@@ -129,11 +137,12 @@ export async function checkIfScoreExistsInEtyping({
     },
     { timeout: 5000 }
   );
-  console.log("JavaScript functions are now available");
+  console.log(`[EtypingChecker] JavaScript functions loaded successfully`);
 
-  // ページ数を取得する
   const pageCount = await page.evaluate(() => (window as any).ps_page_max);
-  console.log(`${pageCount} pages found`);
+  console.log(
+    `[EtypingChecker] Found ${pageCount} total pages for ${categoryId}`
+  );
 
   // ユーザーデータがランキングに存在するか確かめる
   const fetchRankingByPage = createEtypingFetcher({
@@ -147,8 +156,102 @@ export async function checkIfScoreExistsInEtyping({
     pageCount,
   });
 
-  // 接続を切る
+  console.log(
+    `[EtypingChecker] Score existence check completed: ${found ? "FOUND" : "NOT_FOUND"} for ${userData.userName} (${userData.score}) in ${categoryId}`
+  );
+
   puppeteerBrowser.disconnect();
+  console.log(`[EtypingChecker] Browser connection closed for ${categoryId}`);
 
   return found;
+}
+
+type RankingCheckResult =
+  | {
+      type: "page_number_too_large";
+      maxPages: number;
+    }
+  | {
+      type: "user_data_does_not_exist";
+      pageNumber: number;
+    }
+  | {
+      type: "user_data_found_in_page";
+    };
+
+/**
+ * ランキングの指定のページに、ユーザーの情報が登録されているかを確認する
+ */
+export async function checkIfScoreExistsInSpecificPage({
+  browser,
+  categoryId,
+  userData,
+  pageNumber,
+}: {
+  browser: Fetcher;
+  categoryId: string;
+  userData: { userName: string; score: number };
+  pageNumber: number;
+}): Promise<RankingCheckResult> {
+  console.log(
+    `[EtypingPageChecker] Starting specific page check for ${userData.userName} (${userData.score}) on page ${pageNumber} in ${categoryId}`
+  );
+
+  const puppeteerBrowser = await getBrowser(browser);
+  const page = await puppeteerBrowser.newPage();
+  console.log(`[EtypingPageChecker] Browser page created for ${categoryId}`);
+
+  const baseUrl = CATEGORY_URLS[categoryId];
+  console.log(`[EtypingPageChecker] Navigating to: ${baseUrl}`);
+  await page.goto(baseUrl, {
+    waitUntil: "domcontentloaded",
+  });
+
+  console.log(
+    `[EtypingPageChecker] Waiting for JavaScript functions to load...`
+  );
+  await page.waitForFunction(
+    () => {
+      return (
+        typeof (window as any).ps_page_max !== "undefined" &&
+        typeof (window as any).ps_page_move === "function"
+      );
+    },
+    { timeout: 5000 }
+  );
+
+  const pageCount = await page.evaluate(() => (window as any).ps_page_max);
+  console.log(
+    `[EtypingPageChecker] Total pages available: ${pageCount}, requested page: ${pageNumber}`
+  );
+
+  // ページ番号が大きすぎる場合
+  if (pageNumber > pageCount) {
+    console.log(
+      `[EtypingPageChecker] Page number too large: ${pageNumber} > ${pageCount}`
+    );
+    puppeteerBrowser.disconnect();
+    return { type: "page_number_too_large", maxPages: pageCount };
+  }
+
+  // ランキングに存在するか確認する
+  const fetchRankingByPage = createEtypingFetcher({
+    browserPage: page,
+    categoryId,
+  });
+  const found = await hasEtypingScoreInPage({
+    userData,
+    fetchRankingByPage,
+    pageNumber,
+  });
+
+  console.log(
+    `[EtypingPageChecker] Score check result on page ${pageNumber}: ${found ? "FOUND" : "NOT_FOUND"} for ${userData.userName} (${userData.score})`
+  );
+
+  puppeteerBrowser.disconnect();
+  console.log(`[EtypingPageChecker] Browser connection closed`);
+
+  if (found) return { type: "user_data_found_in_page" };
+  else return { type: "user_data_does_not_exist", pageNumber };
 }
