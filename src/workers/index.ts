@@ -200,6 +200,12 @@ const apiApp = new Hono<{ Bindings: Env }>()
     "/update-rankings",
     zValidator("json", rankingUpdateSchema),
     async (c) => {
+      // API key authentication
+      const apiKey = c.req.header("X-API-Key");
+      if (apiKey !== c.env.ADMIN_API_KEY) {
+        return c.json({ error: "Unauthorized access" }, 401);
+      }
+
       const { categoryId, dryRun } = c.req.valid("json");
 
       try {
