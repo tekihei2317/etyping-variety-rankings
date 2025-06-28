@@ -135,6 +135,81 @@ async function getExistingRankingData(
 }
 
 /**
+ * カテゴリIDから対応するお題を取得
+ */
+function getCategoryTheme(categoryId: string): string {
+  const categoryThemeMap: Record<string, string> = {
+    business: "プレゼンの基本",
+    study: "元素名",
+    life: "天気のことば",
+    travel: "世界遺産",
+    sports: "歴代名力士",
+    what: "缶コーヒーのコピー",
+    brain: "なんけた1",
+    dialect: "北海道",
+    long: "世界の童話2",
+    tenkey: "漢数字",
+    hyakunin: "歌人名",
+    siritori: "植物",
+    medical: "医療介護関係の仕事",
+  };
+  return categoryThemeMap[categoryId] || "不明";
+}
+
+/**
+ * ユーザーのスコアをデータベースに登録
+ */
+async function insertUserScore(
+  db: D1Database,
+  categoryId: string,
+  entry: RankingEntry & { rank: number },
+  updateType: "new_record" | "score_update",
+  previousScore?: number
+): Promise<void> {
+  const categoryJapaneseName = getCategoryJapaneseName(categoryId);
+  const categoryTheme = getCategoryTheme(categoryId);
+  const currentDateTime = new Date().toISOString();
+
+  const insertScoreStmt = db
+    .prepare(
+      `INSERT INTO ranking_scores (fetched_at, category, theme, etyping_name, score)
+      VALUES (?, ?, ?, ?, ?)`
+    )
+    .bind(
+      currentDateTime,
+      categoryJapaneseName,
+      categoryTheme,
+      entry.userName,
+      entry.score
+    );
+
+  const insertHistoryStmt = db
+    .prepare(
+      `INSERT INTO score_update_history (username, category, previous_score, new_score, update_type, created_at)
+      VALUES (?, ?, ?, ?, ?, datetime('now'))`
+    )
+    .bind(
+      entry.userName,
+      categoryJapaneseName,
+      previousScore || null,
+      entry.score,
+      updateType
+    );
+
+  await db.batch([insertScoreStmt, insertHistoryStmt]);
+
+  if (updateType === "new_record") {
+    console.log(
+      `[RankingUpdater] Inserted new user: ${entry.userName} (${entry.score}) in ${categoryJapaneseName}`
+    );
+  } else {
+    console.log(
+      `[RankingUpdater] Updated user score: ${entry.userName} ${previousScore} → ${entry.score} in ${categoryJapaneseName}`
+    );
+  }
+}
+
+/**
  * 単一カテゴリのランキングを更新
  */
 export async function updateCategoryRanking({
@@ -163,7 +238,6 @@ export async function updateCategoryRanking({
     });
 
     // 既存データを取得
-    console.log("get existing ranking data");
     const existingData = await getExistingRankingData(db, categoryId);
 
     const result: RankingUpdateResult = {
@@ -186,17 +260,44 @@ export async function updateCategoryRanking({
       if (existingScore !== undefined && entry.score <= existingScore) continue;
 
       if (existingScore) {
+        // スコア更新
+        result.updatedEntries++;
+        result.details.updatedRecords.push({
+          userName: entry.userName,
+          previousScore: existingScore,
+          newScore: entry.score,
+          rank: entry.rank,
+        });
+
         console.log(
           `[UpdateCategoryRanking] Score update for ${entry.userName} ${existingScore} → ${entry.score}`
         );
+
+        if (!dryRun) {
+          await insertUserScore(
+            db,
+            categoryId,
+            entry,
+            "score_update",
+            existingScore
+          );
+        }
       } else {
+        // 新規ユーザー
+        result.newEntries++;
+        result.details.newRecords.push({
+          userName: entry.userName,
+          score: entry.score,
+          rank: entry.rank,
+        });
+
         console.log(
           `[UpdateCategoryRanking] New user ${entry.userName} with score ${entry.score}`
         );
-      }
 
-      if (!dryRun) {
-        // TODO:
+        if (!dryRun) {
+          await insertUserScore(db, categoryId, entry, "new_record");
+        }
       }
     }
 
