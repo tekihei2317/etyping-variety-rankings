@@ -32,12 +32,12 @@ function App() {
       {/* 更新情報 */}
       <div className="bg-gray-50 rounded-lg p-4 text-sm mb-5">
         <div className="flex flex-wrap items-center gap-4 text-gray-600">
-          <span>📅 最終更新: 2025年6月23日</span>
-          <span>🔄 更新頻度: 週1回（日曜日）</span>
+          <span>📅最終更新: 2025年6月28日 16時00分</span>
+          <span>🔄更新頻度: 週1回</span>
           <span>
             <Link
               to="/register"
-              className="text-primary-600 hover:text-primary-700 hover:underline ml-1"
+              className="text-primary-600 hover:text-primary-700 hover:underline"
             >
               スコアを登録する
             </Link>
@@ -118,9 +118,7 @@ function App() {
             <div className="flex justify-center items-center py-12">
               <div className="flex items-center space-x-2">
                 <div className="w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-gray-600">
-                  読み込み中...
-                </span>
+                <span className="text-gray-600">読み込み中...</span>
               </div>
             </div>
           ) : (
@@ -198,9 +196,7 @@ function App() {
                   max={totalPages}
                   className="w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
-                <span className="text-sm text-gray-600">
-                  / {totalPages}
-                </span>
+                <span className="text-sm text-gray-600">/ {totalPages}</span>
                 <button
                   type="submit"
                   className="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200"
