@@ -32,7 +32,7 @@ function App() {
       {/* 更新情報 */}
       <div className="bg-gray-50 rounded-lg p-4 text-sm mb-5">
         <div className="flex flex-wrap items-center gap-4 text-gray-600">
-          <span>📅最終更新: 2025年6月28日 16時00分</span>
+          <span>📅最終更新: 2025年7月6日 21時30分</span>
           <span>🔄更新頻度: 週1回</span>
           <span>
             <Link
