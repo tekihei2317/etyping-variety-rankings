@@ -83,7 +83,7 @@ export function createEtypingFetcher({
         () => {
           return document.querySelector("ul.ranking li:not(.head)") !== null;
         },
-        { timeout: 4000 }
+        { timeout: 5000 }
       );
       console.log(`[EtypingFetcher] Page transition completed: ${page}`);
     } else {
